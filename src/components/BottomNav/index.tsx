@@ -2,8 +2,6 @@ import { Href, router, usePathname } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type TNavItem = {
   id: string
   label: string
@@ -15,8 +13,6 @@ const NAV_ITEMS: TNavItem[] = [
   { id: 'stats', label: 'STATS', route: '/stats' },
   { id: 'history', label: 'HISTORY', route: '/history' },
 ]
-
-// ─── Bottom Nav ───────────────────────────────────────────────────────────────
 
 export default function BottomNav() {
   const pathname = usePathname()
@@ -41,7 +37,7 @@ export default function BottomNav() {
   )
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+BottomNav.displayName = 'BottomNav'
 
 const styles = StyleSheet.create({
   container: {
@@ -72,5 +68,3 @@ const styles = StyleSheet.create({
     color: '#FF3B3B',
   },
 })
-
-BottomNav.displayName = 'BottomNav'

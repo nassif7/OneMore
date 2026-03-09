@@ -1,17 +1,13 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface CounterBlockProps {
+interface ICounterBlockProps {
   count: number
   avgGap: string
   timeSinceLast: string
 }
 
-// ─── Counter Block ────────────────────────────────────────────────────────────
-
-export default function CounterBlock({ count, avgGap, timeSinceLast }: CounterBlockProps) {
+export default function CounterBlock({ count, avgGap, timeSinceLast }: ICounterBlockProps) {
   return (
     <View style={styles.container}>
       {/* Count */}
@@ -35,7 +31,7 @@ export default function CounterBlock({ count, avgGap, timeSinceLast }: CounterBl
   )
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+CounterBlock.displayName = 'CounterBlock'
 
 const styles = StyleSheet.create({
   container: {
@@ -82,5 +78,3 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 })
-
-CounterBlock.displayName = 'CounterBlock'

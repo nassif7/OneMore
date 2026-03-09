@@ -1,15 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface NudgeTickerProps {
+interface INudgeTickerProps {
   nudge: string
 }
 
-// ─── Nudge Ticker ─────────────────────────────────────────────────────────────
-
-export default function NudgeTicker({ nudge }: NudgeTickerProps) {
+export default function NudgeTicker({ nudge }: INudgeTickerProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{nudge}</Text>
@@ -17,7 +13,7 @@ export default function NudgeTicker({ nudge }: NudgeTickerProps) {
   )
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+NudgeTicker.displayName = 'NudgeTicker'
 
 const styles = StyleSheet.create({
   container: {
@@ -34,5 +30,3 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
   },
 })
-
-NudgeTicker.displayName = 'NudgeTicker'
