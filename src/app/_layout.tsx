@@ -1,16 +1,14 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import React from 'react';
-import { useColorScheme } from 'react-native';
+import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue'
+import { SpaceMono_700Bold } from '@expo-google-fonts/space-mono'
+import { Slot } from 'expo-router'
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    BebasNeue: BebasNeue_400Regular,
+    SpaceMono: SpaceMono_700Bold,
+  })
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
-  );
+  if (!fontsLoaded) return null
+
+  return <Slot />
 }

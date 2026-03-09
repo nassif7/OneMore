@@ -1,17 +1,8 @@
-import { BottomNav, ScreenHeader } from '@/components'
-import { getAvgGap, getTimeSinceLast } from '@/services/stats'
-import { getDay, logCigarette } from '@/services/storage'
-import * as Haptics from 'expo-haptics'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Animated, AppState, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useFonts } from 'expo-font'
+import React, { useRef, useState } from 'react'
+import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface HomeScreenProps {
-  navigation?: {
-    navigate: (screen: string) => void
-  }
-}
+const { width } = Dimensions.get('window')
 
 const NUDGES: string[] = [
   'GO ON THEN.',
@@ -22,65 +13,137 @@ const NUDGES: string[] = [
   'ACCOUNTABILITY? NEVER HEARD OF HER.',
 ]
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface FireParticleProps {
+  x: number
+  delay: number
+}
+
+interface FireParticleData {
+  id: number
+  x: number
+  delay: number
+}
+
+interface HomeScreenProps {
+  navigation?: {
+    navigate: (screen: string) => void
+  }
+}
+
+// ─── Fire Particle ────────────────────────────────────────────────────────────
+
+function FireParticle({ x, delay }: FireParticleProps) {
+  const translateY = useRef(new Animated.Value(0)).current
+  const opacity = useRef(new Animated.Value(1)).current
+  const scale = useRef(new Animated.Value(1)).current
+
+  const EMOJIS = ['🔥', '💥', '✨', '🔥', '🔥']
+  const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+  const size = 16 + Math.floor(Math.random() * 22)
+
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: -130,
+        duration: 750,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 750,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 0.2,
+        duration: 750,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [])
+
+  return (
+    <Animated.Text
+      style={{
+        position: 'absolute',
+        left: x,
+        bottom: 10,
+        fontSize: size,
+        transform: [{ translateY }, { scale }],
+        opacity,
+      }}
+    >
+      {emoji}
+    </Animated.Text>
+  )
+}
+
 // ─── Home Screen ──────────────────────────────────────────────────────────────
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const [times, setTimes] = useState<number[]>([])
+  const [count, setCount] = useState<number>(0)
   const [nudge, setNudge] = useState<string>(NUDGES[0])
+  const [fires, setFires] = useState<FireParticleData[]>([])
   const [pressed, setPressed] = useState<boolean>(false)
 
   const buttonScale = useRef(new Animated.Value(1)).current
-  const flashOpacity = useRef(new Animated.Value(0)).current
 
-  // Derived stats
-  const count = times.length
-  const avgGap = getAvgGap(times)
-  const timeSinceLast = getTimeSinceLast(times)
+  const [fontsLoaded] = useFonts({
+    BebasNeue: require('./assets/fonts/BebasNeue-Regular.ttf'),
+    SpaceMono: require('./assets/fonts/SpaceMono-Bold.ttf'),
+  })
 
-  // Load today's data on mount and when app comes back to foreground
-  const loadToday = useCallback(async () => {
-    const todayTimes = await getDay(new Date())
-    setTimes(todayTimes)
-  }, [])
-
-  useEffect(() => {
-    loadToday()
-
-    // Reload if user backgrounds and returns (midnight rollover etc.)
-    const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active') loadToday()
-    })
-    return () => sub.remove()
-  }, [loadToday])
-
-  const handleSmoke = async (): Promise<void> => {
-    // Haptic thud
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-
-    // Button slam
+  const handleSmoke = (): void => {
     Animated.sequence([
-      Animated.timing(buttonScale, { toValue: 0.9, duration: 70, useNativeDriver: true }),
-      Animated.spring(buttonScale, { toValue: 1, useNativeDriver: true, damping: 4, stiffness: 300 }),
+      Animated.timing(buttonScale, {
+        toValue: 0.94,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
     ]).start()
-
-    // Fire flash
-    Animated.sequence([
-      Animated.timing(flashOpacity, { toValue: 0.3, duration: 40, useNativeDriver: true }),
-      Animated.timing(flashOpacity, { toValue: 0, duration: 350, useNativeDriver: true }),
-    ]).start()
-
-    // Persist to storage, get back updated times array
-    const updated = await logCigarette()
-    setTimes(updated)
-    setNudge(NUDGES[Math.floor(Math.random() * NUDGES.length)])
 
     setPressed(true)
-    setTimeout(() => setPressed(false), 120)
+    setCount((c) => c + 1)
+    setNudge(NUDGES[Math.floor(Math.random() * NUDGES.length)])
+
+    const newFires: FireParticleData[] = Array.from({ length: 10 }, (_, i) => ({
+      id: Date.now() + i,
+      x: 30 + Math.random() * (width * 0.5 - 60),
+      delay: Math.random() * 250,
+    }))
+
+    setFires(newFires)
+
+    setTimeout(() => {
+      setPressed(false)
+      setFires([])
+    }, 1000)
   }
+
+  if (!fontsLoaded) return null
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="ONEMORE" showSubtitle={true} />
+      {/* Top bar */}
+      <View style={styles.topBar}>
+        <View>
+          <Text style={styles.appName}>ONEMORE</Text>
+          <Text style={styles.tagline}>NO GUILT. JUST COUNTS.</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.dateText}>SUN</Text>
+          <Text style={styles.dateText}>MAR 8</Text>
+        </View>
+      </View>
 
       {/* Counter block */}
       <View style={styles.counterBlock}>
@@ -88,15 +151,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <Text style={styles.label}>TODAY'S COUNT</Text>
           <Text style={styles.countNumber}>{count}</Text>
         </View>
-        <View style={{ alignItems: 'flex-end', gap: 8 }}>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.statLabel}>AVG GAP</Text>
-            <Text style={styles.statValue}>{avgGap}</Text>
-          </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.statLabel}>LAST ONE</Text>
-            <Text style={styles.statValue}>{timeSinceLast}</Text>
-          </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.packsLabel}>≈ PACKS</Text>
+          <Text style={styles.packsNumber}>{(count / 20).toFixed(1)}</Text>
         </View>
       </View>
 
@@ -107,6 +164,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
       {/* Button area */}
       <View style={styles.buttonArea}>
+        {fires.map((f) => (
+          <FireParticle key={f.id} x={f.x} delay={f.delay} />
+        ))}
         <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
           <TouchableOpacity
             onPress={handleSmoke}
@@ -118,12 +178,18 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         </Animated.View>
       </View>
 
-      {/* Fire flash overlay */}
-      <Animated.View
-        pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: '#FF4500', opacity: flashOpacity }]}
-      />
-      <BottomNav />
+      {/* Bottom nav */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={[styles.navButton, { borderRightWidth: 3 }]}
+          onPress={() => navigation?.navigate('Stats')}
+        >
+          <Text style={styles.navText}>STATS</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation?.navigate('History')}>
+          <Text style={styles.navText}>HISTORY</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -135,6 +201,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F0E8',
   },
+
+  // Top bar
   topBar: {
     borderBottomWidth: 3,
     borderColor: '#000',
@@ -166,6 +234,8 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     color: '#000',
   },
+
+  // Counter
   counterBlock: {
     borderBottomWidth: 3,
     borderColor: '#000',
@@ -190,18 +260,19 @@ const styles = StyleSheet.create({
     letterSpacing: -2,
     color: '#000',
   },
-  statLabel: {
+  packsLabel: {
     fontFamily: 'SpaceMono',
-    fontSize: 9,
-    letterSpacing: 2,
+    fontSize: 10,
     color: '#666',
+    marginBottom: 4,
   },
-  statValue: {
+  packsNumber: {
     fontFamily: 'BebasNeue',
-    fontSize: 22,
+    fontSize: 36,
     color: '#000',
-    letterSpacing: 1,
   },
+
+  // Nudge
   nudgeTicker: {
     borderBottomWidth: 3,
     borderColor: '#000',
@@ -215,10 +286,13 @@ const styles = StyleSheet.create({
     color: '#FF3B3B',
     letterSpacing: 3,
   },
+
+  // Button
   buttonArea: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   smokeButton: {
     width: 200,
@@ -251,6 +325,8 @@ const styles = StyleSheet.create({
   buttonTextPressed: {
     color: '#FF3B3B',
   },
+
+  // Bottom nav
   bottomNav: {
     borderTopWidth: 3,
     borderColor: '#000',
