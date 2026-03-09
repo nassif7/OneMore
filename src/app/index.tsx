@@ -1,4 +1,5 @@
 import { BottomNav, ScreenHeader } from '@/components'
+import { scheduleFirstCigNotification, scheduleNextNotification } from '@/services/notifications'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
 import { getDay, logCigarette } from '@/services/storage'
 import * as Haptics from 'expo-haptics'
@@ -72,6 +73,13 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     // Persist to storage, get back updated times array
     const updated = await logCigarette()
     setTimes(updated)
+    const lastCigTime = updated[updated.length - 1]
+    if (updated.length === 1) {
+      // First cig of the day — schedule tomorrow's first cig notif
+      await scheduleFirstCigNotification()
+    }
+    await scheduleNextNotification(lastCigTime)
+
     setNudge(NUDGES[Math.floor(Math.random() * NUDGES.length)])
 
     setPressed(true)
