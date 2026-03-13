@@ -2,15 +2,11 @@ import { router } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ScreenHeaderProps {
+interface IScreenHeaderProps {
   showBack?: boolean
   title?: string
   showSubtitle?: boolean
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const getDateStrings = () => {
   const now = new Date()
@@ -19,9 +15,11 @@ const getDateStrings = () => {
   return { weekday, date }
 }
 
-// ─── Screen Header ────────────────────────────────────────────────────────────
-
-export default function ScreenHeader({ showBack = false, title = 'ONEMORE', showSubtitle = false }: ScreenHeaderProps) {
+export default function ScreenHeader({
+  showBack = false,
+  title = 'ONEMORE',
+  showSubtitle = false,
+}: IScreenHeaderProps) {
   const { weekday, date } = getDateStrings()
 
   return (
@@ -45,7 +43,7 @@ export default function ScreenHeader({ showBack = false, title = 'ONEMORE', show
   )
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+ScreenHeader.displayName = 'ScreenHeader'
 
 const styles = StyleSheet.create({
   container: {
@@ -108,5 +106,3 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 })
-
-ScreenHeader.displayName = 'ScreenHeader'
