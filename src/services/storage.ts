@@ -1,8 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const DAY_PREFIX = 'day:'
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export const keyForDate = (date: Date): string => date.toISOString().split('T')[0] // "2026-03-08"
+export const keyForDate = (date: Date): string => `${DAY_PREFIX}${date.toISOString().split('T')[0]}` // "day:2026-03-08"
 
 // ─── Write ────────────────────────────────────────────────────────────────────
 
@@ -30,7 +34,9 @@ export const getLast7Days = async (): Promise<Record<string, number[]>> => {
     date.setDate(date.getDate() - i)
     const key = keyForDate(date)
     const data = await AsyncStorage.getItem(key)
-    result[key] = data ? JSON.parse(data) : []
+    // Strip prefix for the result key so consumers get clean date strings
+    const dateStr = key.replace(DAY_PREFIX, '')
+    result[dateStr] = data ? JSON.parse(data) : []
   }
   return result
 }
