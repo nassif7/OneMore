@@ -10,8 +10,12 @@ import { formatTime } from "@/services/stats";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { toCalendarDateString } from "@/helpers";
+import { useLocalSearchParams } from "expo-router";
 
 export default function HistoryScreen() {
+  const { date } = useLocalSearchParams<{ date?: string }>();
+  const initialDate = date ? new Date(date) : undefined;
+
   const {
     entry,
     selectedDate,
@@ -20,8 +24,9 @@ export default function HistoryScreen() {
     goToNextDay,
     goToDate,
     reload,
-  } = useHistoryData();
+  } = useHistoryData(initialDate);
 
+  // rest of the screen unchanged
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null);
   const [editingTs, setEditingTs] = useState<number | null>(null);
@@ -120,15 +125,8 @@ export default function HistoryScreen() {
 HistoryScreen.displayName = "HistoryScreen";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F0E8",
-  },
-  emptyState: {
-    padding: 40,
-    alignItems: "center",
-    gap: 8,
-  },
+  container: { flex: 1, backgroundColor: "#F5F0E8" },
+  emptyState: { padding: 40, alignItems: "center", gap: 8 },
   emptyTitle: {
     fontFamily: "BebasNeue",
     fontSize: 36,

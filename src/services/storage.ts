@@ -77,6 +77,13 @@ export const getDay = async (date: Date): Promise<number[]> => {
   return data ? JSON.parse(data) : [];
 };
 
+export const getWeek = async (
+  dateKeys: string[],
+): Promise<Record<string, number[]>> => {
+  const storageKeys = dateKeys.map((k) => `${DAY_PREFIX}${k}`);
+  return fetchDays(storageKeys);
+};
+
 export const getLast7Days = async (): Promise<Record<string, number[]>> => {
   return fetchDays(dateRangeKeys(7));
 };

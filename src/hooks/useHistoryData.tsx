@@ -52,10 +52,11 @@ const isToday = (date: Date): boolean => {
 
 // ─── useHistoryData ───────────────────────────────────────────────────────────
 
-export default function useHistoryData() {
+export default function useHistoryData(initialDate?: Date) {
   const [selectedDate, setSelectedDate] = useState<Date>(
-    startOfDay(new Date()),
+    initialDate ? startOfDay(initialDate) : startOfDay(new Date()),
   );
+
   const [entry, setEntry] = useState<TDayEntry | null>(null);
 
   const loadData = useCallback(async () => {
