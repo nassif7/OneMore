@@ -8,3 +8,5 @@ export { default as LogRow } from "./LogRow";
 export { default as DayNavigator } from "./DayNavigator";
 export { default as CalendarSheet } from "./CalendarSheet";
 export { default as TimePickerSheet } from "./TimePickerSheet";
+export { default as NudgeBox } from "./NudgeBox";
+export { default as StatsComparison } from "./StatsComparison";

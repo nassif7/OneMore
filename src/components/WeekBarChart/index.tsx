@@ -1,104 +1,176 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { TWeekStats } from "@/hooks/useStatsData";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const BAR_TRACK_HEIGHT = 150;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type TDayBar = {
-  label: string
-  count: number
-}
+  label: string;
+  count: number;
+  isToday: boolean;
+  dateStr: string;
+};
 
 interface IWeekBarChartProps {
-  data: TDayBar[]
+  data: TDayBar[];
+  weekLabel: string;
+  currentWeekStats: TWeekStats;
+  prevWeekStats: TWeekStats | null;
+  onPrevWeek: () => void;
+  onNextWeek: () => void;
+  canGoNext: boolean;
+  onDayPress: (dateStr: string) => void;
 }
 
 // ─── Week Bar Chart ───────────────────────────────────────────────────────────
 
-export default function WeekBarChart({ data }: IWeekBarChartProps) {
-  const maxCount = Math.max(...data.map((d) => d.count), 1)
+export default function WeekBarChart({
+  data,
+  weekLabel,
+  onPrevWeek,
+  onNextWeek,
+  canGoNext,
+  onDayPress,
+}: IWeekBarChartProps) {
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>LAST 7 DAYS</Text>
+      {/* Navigation header */}
+      <View style={styles.navRow}>
+        <TouchableOpacity onPress={onPrevWeek} style={styles.navBtn}>
+          <Text style={styles.navArrow}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>{weekLabel}</Text>
+        <TouchableOpacity
+          onPress={onNextWeek}
+          style={styles.navBtn}
+          disabled={!canGoNext}
+        >
+          <Text
+            style={[styles.navArrow, !canGoNext && styles.navArrowDisabled]}
+          >
+            →
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bar chart */}
       <View style={styles.chart}>
         {data.map((d, i) => {
-          const isToday = i === data.length - 1
-          const barH = (d.count / maxCount) * 100
-
+          const barH = (d.count / maxCount) * BAR_TRACK_HEIGHT;
           return (
-            <View key={`${d.label}-${i}`} style={styles.barWrapper}>
-              {d.count > 0 && <Text style={[styles.barCount, isToday && styles.barCountToday]}>{d.count}</Text>}
+            <TouchableOpacity
+              key={`${d.label}-${i}`}
+              style={styles.barWrapper}
+              onPress={() => d.count > 0 && onDayPress(d.dateStr)}
+              activeOpacity={d.count > 0 ? 0.7 : 1}
+            >
+              {d.count > 0 && (
+                <Text
+                  style={[styles.barCount, d.isToday && styles.barCountToday]}
+                >
+                  {d.count}
+                </Text>
+              )}
               <View style={styles.barTrack}>
                 <View
                   style={[
                     styles.bar,
                     {
                       height: barH,
-                      backgroundColor: isToday ? '#FF3B3B' : '#000',
+                      backgroundColor: d.isToday ? "#FF4500" : "#000",
                     },
                   ]}
                 />
               </View>
-              <Text style={styles.barLabel}>{d.label}</Text>
-            </View>
-          )
+              <Text
+                style={[styles.barLabel, d.isToday && styles.barLabelToday]}
+              >
+                {d.label}
+              </Text>
+            </TouchableOpacity>
+          );
         })}
       </View>
     </View>
-  )
+  );
 }
 
-WeekBarChart.displayName = 'WeekBarChart'
+WeekBarChart.displayName = "WeekBarChart";
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
     borderBottomWidth: 3,
-    borderColor: '#000',
+    borderColor: "#000",
   },
-  title: {
-    fontFamily: 'SpaceMono',
-    fontSize: 10,
-    letterSpacing: 3,
-    color: '#000',
+  navRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
+  navBtn: {
+    padding: 4,
+  },
+  navArrow: {
+    fontFamily: "BebasNeue",
+    fontSize: 24,
+    color: "#000",
+  },
+  navArrowDisabled: {
+    color: "#ccc",
+  },
+  title: {
+    fontFamily: "SpaceMono",
+    fontSize: 10,
+    letterSpacing: 3,
+    color: "#000",
+  },
   chart: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 6,
-    height: 120,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    height: BAR_TRACK_HEIGHT + 30,
   },
   barWrapper: {
     flex: 1,
-    alignItems: 'center',
-    height: 120,
-    justifyContent: 'flex-end',
+    alignItems: "center",
+    height: BAR_TRACK_HEIGHT + 30,
+    justifyContent: "flex-end",
+    paddingHorizontal: 3,
+  },
+  barTrack: {
+    width: "100%",
+    height: BAR_TRACK_HEIGHT,
+    justifyContent: "flex-end",
+  },
+  bar: {
+    width: "100%",
+    minHeight: 4,
   },
   barCount: {
-    fontFamily: 'BebasNeue',
+    fontFamily: "BebasNeue",
     fontSize: 12,
-    color: '#000',
+    color: "#000",
     marginBottom: 2,
   },
   barCountToday: {
-    color: '#FF3B3B',
-  },
-  barTrack: {
-    width: '100%',
-    height: 100,
-    justifyContent: 'flex-end',
-  },
-  bar: {
-    width: '100%',
-    borderWidth: 2,
-    borderColor: '#000',
-    minHeight: 4,
+    color: "#FF4500",
   },
   barLabel: {
-    fontFamily: 'SpaceMono',
+    fontFamily: "SpaceMono",
     fontSize: 9,
-    color: '#000',
+    color: "#000",
     marginTop: 4,
   },
-})
+  barLabelToday: {
+    color: "#FF4500",
+  },
+});

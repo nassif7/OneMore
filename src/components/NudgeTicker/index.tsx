@@ -1,8 +1,8 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface INudgeTickerProps {
-  nudge: string
+  nudge: string;
 }
 
 export default function NudgeTicker({ nudge }: INudgeTickerProps) {
@@ -10,23 +10,23 @@ export default function NudgeTicker({ nudge }: INudgeTickerProps) {
     <View style={styles.container}>
       <Text style={styles.text}>{nudge}</Text>
     </View>
-  )
+  );
 }
 
-NudgeTicker.displayName = 'NudgeTicker'
+NudgeTicker.displayName = "NudgeTicker";
 
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 3,
-    borderColor: '#000',
+    borderColor: "#000",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   text: {
-    fontFamily: 'BebasNeue',
+    fontFamily: "BebasNeue",
     fontSize: 18,
-    color: '#FF3B3B',
+    color: "#FF4500",
     letterSpacing: 3,
   },
-})
+});

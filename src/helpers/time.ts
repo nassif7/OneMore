@@ -17,3 +17,12 @@ export const toCalendarDateString = (date: Date): string => {
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 };
+
+export function formatTimeUntil(ms: number): string {
+  const totalMinutes = Math.round(ms / 60000);
+  if (totalMinutes <= 0) return "SOON";
+  if (totalMinutes < 60) return `${totalMinutes}M`;
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return m > 0 ? `${h}H ${m}M` : `${h}H`;
+}

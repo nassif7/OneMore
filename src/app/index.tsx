@@ -1,16 +1,28 @@
 import { BottomNav, ScreenHeader } from "@/components";
 import CounterBlock from "@/components/CounterBlock";
+import NudgeBox from "@/components/NudgeBox";
 import NudgeTicker from "@/components/NudgeTicker";
 import SmokeButton from "@/components/SmokeButton";
 import useSmokeLogger from "@/hooks/useSmokeLogger";
 import useTodayTimes from "@/hooks/useTodayTimes";
 import { getAvgGap, getTimeSinceLast } from "@/services/stats";
-import { StyleSheet, View } from "react-native";
-import { computePattern } from "@/services/notifications";
+
 import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import {
+  computePattern,
+  getNextNotificationTime,
+  getNextNotificationBody,
+} from "@/services/notifications";
 
 export default function HomeScreen() {
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null);
+  const [nextNotificationTime, setNextNotificationTime] = useState<
+    number | null
+  >(null);
+  const [nextNotificationBody, setNextNotificationBody] = useState<
+    string | null
+  >(null);
 
   const { times, setTimes } = useTodayTimes();
   const { nudge, handleSmoke } = useSmokeLogger({
@@ -19,7 +31,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     computePattern().then((p) => setAvgGapMs(p.avgGapMs));
-  }, [times]); // recompute when a new cig is logged
+    getNextNotificationTime().then(setNextNotificationTime);
+    getNextNotificationBody().then(setNextNotificationBody);
+  }, [times]);
 
   const count = times.length;
   const avgGap = getAvgGap(times);
@@ -39,8 +53,12 @@ export default function HomeScreen() {
         avgGap={avgGap}
         timeSinceLast={timeSinceLast}
       />
-      <NudgeTicker nudge={nudge} />
-      <SmokeButton onPress={handleSmoke} gapRatio={gapRatio} />
+
+      <NudgeBox
+        nextNotificationTime={nextNotificationTime}
+        nextNotificationBody={nextNotificationBody}
+      />
+      <SmokeButton onPress={handleSmoke} />
       <BottomNav />
     </View>
   );
