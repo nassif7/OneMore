@@ -1,5 +1,7 @@
 export { default as BottomNav } from './BottomNav'
 export { default as CounterBlock } from './CounterBlock'
+export { default as DayDetail } from './DayDetail'
+export { default as DayRow } from './DayRow'
 export { default as NudgeTicker } from './NudgeTicker'
 export { default as ScreenHeader } from './ScreenHeader'
 export { default as SmokeButton } from './SmokeButton'
