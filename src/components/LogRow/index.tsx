@@ -1,0 +1,119 @@
+import { Edit2, Trash } from "lucide-react-native";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getGapColor, formatGap } from "@/helpers";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface ILogRowProps {
+  index: number;
+  timestamp: number;
+  time: string;
+  gapMs: number | null;
+  avgGapMs: number | null;
+  onEdit: (ts: number) => void;
+  onDelete: (ts: number) => void;
+}
+
+// ─── Log Row ──────────────────────────────────────────────────────────────────
+
+export default function LogRow({
+  index,
+  timestamp,
+  time,
+  gapMs,
+  avgGapMs,
+  onEdit,
+  onDelete,
+}: ILogRowProps) {
+  const ratio =
+    gapMs !== null && avgGapMs !== null && gapMs > 0 ? gapMs / avgGapMs : null;
+
+  const color = getGapColor(ratio);
+
+  const isColored = color !== "#F5F0E8";
+  const textColor = isColored ? "#fff" : "#000";
+  const subTextColor = isColored ? "rgba(255,255,255,0.7)" : "#666";
+  const indexColor = isColored ? "rgba(255,255,255,0.5)" : "#999";
+
+  return (
+    <View style={[styles.container, { backgroundColor: color }]}>
+      {/* Index */}
+      <Text style={[styles.index, { color: indexColor }]}>#{index}</Text>
+
+      {/* Time + gap */}
+      <View style={styles.main}>
+        <Text style={[styles.time, { color: textColor }]}>{time}</Text>
+        {gapMs !== null && (
+          <Text style={[styles.gap, { color: subTextColor }]}>
+            +{formatGap(gapMs)} since last
+          </Text>
+        )}
+      </View>
+
+      {/* Actions */}
+      <View style={styles.actions}>
+        <TouchableOpacity
+          onPress={() => onEdit(timestamp)}
+          style={styles.actionButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Edit2 size={16} color={textColor} strokeWidth={2} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onDelete(timestamp)}
+          style={styles.actionButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Trash size={16} color={textColor} strokeWidth={2} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+LogRow.displayName = "LogRow";
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const styles = StyleSheet.create({
+  container: {
+    borderBottomWidth: 2,
+    borderColor: "#000",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  index: {
+    fontFamily: "SpaceMono",
+    fontSize: 9,
+    letterSpacing: 1,
+    width: 24,
+  },
+  main: {
+    flex: 1,
+    gap: 2,
+  },
+  time: {
+    fontFamily: "BebasNeue",
+    fontSize: 28,
+    letterSpacing: 2,
+    lineHeight: 28,
+  },
+  gap: {
+    fontFamily: "SpaceMono",
+    fontSize: 9,
+    letterSpacing: 1,
+  },
+  actions: {
+    flexDirection: "row",
+    gap: 16,
+    alignItems: "center",
+  },
+  actionButton: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
