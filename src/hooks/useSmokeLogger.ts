@@ -14,11 +14,12 @@ const NUDGES: string[] = [
 
 const randomNudge = (): string => NUDGES[Math.floor(Math.random() * NUDGES.length)]
 
-interface UseSmokeLoggerProps {
+interface IUseSmokeLoggerProps {
   onSmoked: (updatedTimes: number[]) => void
+  onScheduled?: () => void
 }
 
-export default function useSmokeLogger({ onSmoked }: UseSmokeLoggerProps) {
+export default function useSmokeLogger({ onSmoked, onScheduled }: IUseSmokeLoggerProps) {
   const [nudge, setNudge] = useState<string>(NUDGES[0])
 
   const handleSmoke = useCallback(async (): Promise<void> => {
@@ -27,15 +28,13 @@ export default function useSmokeLogger({ onSmoked }: UseSmokeLoggerProps) {
     const updated = await logCigarette()
     const lastCigTime = updated[updated.length - 1]
 
-    if (updated.length === 1) {
-      await scheduleFirstCigNotification()
-    }
+    if (updated.length === 1) await scheduleFirstCigNotification()
     await scheduleNextNotification(lastCigTime)
 
     setNudge(randomNudge())
-
     onSmoked(updated)
-  }, [onSmoked])
+    onScheduled?.()
+  }, [onSmoked, onScheduled])
 
   return { nudge, handleSmoke }
 }
