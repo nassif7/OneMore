@@ -22,3 +22,11 @@ export const NUDGES = [
 // ─── Thresholds ───────────────────────────────────────────────────────────────
 
 export const MIN_GAPS_FOR_CUTOFF = 5
+
+// ─── Notification Scheduling ──────────────────────────────────────────────────
+
+/** Multiplier to add buffer to predicted notification time (e.g., 1.1x = +10%) */
+export const NEXT_NOTIF_TIME_BUFFER = 1.1
+
+/** Minutes before average last cigarette time to stop scheduling notifications */
+export const SLEEP_TIME_CUTOFF_MINUTES = 30
