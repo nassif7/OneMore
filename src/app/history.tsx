@@ -1,76 +1,68 @@
-import { BottomNav, ScreenHeader } from "@/components";
-import CalendarSheet from "@/components/CalendarSheet";
-import DayNavigator from "@/components/DayNavigator";
-import LogRow from "@/components/LogRow";
-import TimePickerSheet from "@/components/TimePickerSheet";
-import useHistoryData from "@/hooks/useHistoryData";
-import { computePattern } from "@/services/notifications";
-import { deleteLog, editLog } from "@/services/storage";
-import { formatTime } from "@/services/stats";
-import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
-import { toCalendarDateString } from "@/helpers";
-import { useLocalSearchParams } from "expo-router";
+import { BottomNav, ScreenHeader } from '@/components'
+import CalendarSheet from '@/components/CalendarSheet'
+import DayNavigator from '@/components/DayNavigator'
+import LogRow from '@/components/LogRow'
+import TimePickerSheet from '@/components/TimePickerSheet'
+import { toCalendarDateString } from '@/helpers'
+import useHistoryData from '@/hooks/useHistoryData'
+import { computePattern } from '@/services/patternCalculator'
+import { formatTime } from '@/services/stats'
+import { deleteLog, editLog } from '@/services/storage'
+import { useLocalSearchParams } from 'expo-router'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 export default function HistoryScreen() {
-  const { date } = useLocalSearchParams<{ date?: string }>();
-  const initialDate = date ? new Date(date) : undefined;
+  const { date } = useLocalSearchParams<{ date?: string }>()
+  const initialDate = date ? new Date(date) : undefined
 
-  const {
-    entry,
-    selectedDate,
-    isToday,
-    goToPrevDay,
-    goToNextDay,
-    goToDate,
-    reload,
-  } = useHistoryData(initialDate);
+  const { entry, selectedDate, isToday, goToPrevDay, goToNextDay, goToDate, reload } = useHistoryData(initialDate)
 
   // rest of the screen unchanged
-  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
-  const [avgGapMs, setAvgGapMs] = useState<number | null>(null);
-  const [editingTs, setEditingTs] = useState<number | null>(null);
-  const [editTime, setEditTime] = useState<Date>(new Date());
+  const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
+  const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
+  const [editingTs, setEditingTs] = useState<number | null>(null)
+  const [editTime, setEditTime] = useState<Date>(new Date())
 
-  const times = entry?.times ? [...entry.times].reverse() : [];
-  const dateStr = toCalendarDateString(selectedDate);
+  const times = useMemo(() => (entry?.times ? [...entry.times].reverse() : []), [entry?.times])
+  const dateStr = toCalendarDateString(selectedDate)
 
   useEffect(() => {
-    computePattern().then((p) => setAvgGapMs(p.avgGapMs));
-  }, [entry]);
+    computePattern().then((p) => setAvgGapMs(p.avgGapMs))
+  }, [entry])
 
   const handleDelete = (ts: number) => {
-    Alert.alert("DELETE LOG", `Remove the ${formatTime(ts)} log?`, [
-      { text: "CANCEL", style: "cancel" },
+    Alert.alert('DELETE LOG', `Remove the ${formatTime(ts)} log?`, [
+      { text: 'CANCEL', style: 'cancel' },
       {
-        text: "DELETE",
-        style: "destructive",
+        text: 'DELETE',
+        style: 'destructive',
         onPress: async () => {
-          await deleteLog(selectedDate, ts);
-          reload();
+          await deleteLog(selectedDate, ts)
+          reload()
         },
       },
-    ]);
-  };
+    ])
+  }
 
   const handleEditOpen = (ts: number) => {
-    setEditingTs(ts);
-    setEditTime(new Date(ts));
-  };
+    setEditingTs(ts)
+    setEditTime(new Date(ts))
+  }
 
   const handleEditSave = async () => {
-    if (editingTs === null) return;
-    await editLog(selectedDate, editingTs, editTime.getTime());
-    setEditingTs(null);
-    reload();
-  };
+    if (editingTs === null) return
+    await editLog(selectedDate, editingTs, editTime.getTime())
+    setEditingTs(null)
+    reload()
+  }
 
   return (
     <View style={styles.container}>
       <ScreenHeader showBack />
       <DayNavigator
-        label={entry?.label ?? ""}
-        fullDate={entry?.fullDate ?? ""}
+        label={entry?.label ?? ''}
+        fullDate={entry?.fullDate ?? ''}
         isToday={isToday}
         onPrev={goToPrevDay}
         onNext={goToNextDay}
@@ -84,8 +76,8 @@ export default function HistoryScreen() {
           </View>
         )}
         {times.map((ts, i) => {
-          const prevTs = times[i + 1] ?? null;
-          const gapMs = prevTs !== null ? ts - prevTs : null;
+          const prevTs = times[i + 1] ?? null
+          const gapMs = prevTs !== null ? ts - prevTs : null
           return (
             <LogRow
               key={ts}
@@ -97,7 +89,7 @@ export default function HistoryScreen() {
               onEdit={handleEditOpen}
               onDelete={handleDelete}
             />
-          );
+          )
         })}
         <View style={{ height: 20 }} />
       </ScrollView>
@@ -112,31 +104,31 @@ export default function HistoryScreen() {
         visible={calendarVisible}
         selectedDateStr={dateStr}
         onDayPress={(dateString) => {
-          goToDate(new Date(dateString));
-          setCalendarVisible(false);
+          goToDate(new Date(dateString))
+          setCalendarVisible(false)
         }}
         onClose={() => setCalendarVisible(false)}
       />
       <BottomNav />
     </View>
-  );
+  )
 }
 
-HistoryScreen.displayName = "HistoryScreen";
+HistoryScreen.displayName = 'HistoryScreen'
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F0E8" },
-  emptyState: { padding: 40, alignItems: "center", gap: 8 },
+  container: { flex: 1, backgroundColor: '#F5F0E8' },
+  emptyState: { padding: 40, alignItems: 'center', gap: 8 },
   emptyTitle: {
-    fontFamily: "BebasNeue",
+    fontFamily: 'BebasNeue',
     fontSize: 36,
     letterSpacing: 3,
-    color: "#000",
+    color: '#000',
   },
   emptySubtitle: {
-    fontFamily: "SpaceMono",
+    fontFamily: 'SpaceMono',
     fontSize: 11,
-    color: "#666",
+    color: '#666',
     letterSpacing: 2,
   },
-});
+})

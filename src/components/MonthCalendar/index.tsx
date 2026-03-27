@@ -1,14 +1,8 @@
+import { MonthCalendarProps } from '@/types'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar } from 'react-native-calendars'
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface IMonthCalendarProps {
-  monthData: Record<string, number>
-  dailyAvg: number
-}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -47,7 +41,7 @@ function DayComponent({ date, count, avg, isToday }: { date: string; count: numb
 
 // ─── Month Calendar ───────────────────────────────────────────────────────────
 
-export default function MonthCalendar({ monthData, dailyAvg }: IMonthCalendarProps) {
+export default function MonthCalendar({ monthData, dailyAvg }: MonthCalendarProps) {
   const todayStr = new Date().toISOString().slice(0, 10)
   const [currentMonth, setCurrentMonth] = useState(new Date())
 

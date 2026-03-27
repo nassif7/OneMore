@@ -1,25 +1,13 @@
-import { scheduleFirstCigNotification, scheduleNextNotification } from '@/services/notifications'
+import { NUDGES } from '@/constants'
+import { scheduleFirstCigNotification, scheduleNextNotification } from '@/services/notificationScheduler'
 import { logCigarette } from '@/services/storage'
+import { UseSmokeLoggerProps } from '@/types'
 import * as Haptics from 'expo-haptics'
 import { useCallback, useState } from 'react'
 
-const NUDGES: string[] = [
-  'GO ON THEN.',
-  "WE'RE NOT JUDGING.",
-  'YOUR LUNGS, YOUR RULES.',
-  'ONE MORE NEVER KILLED— wait.',
-  'DO IT. DO IT. DO IT.',
-  'ACCOUNTABILITY? NEVER HEARD OF HER.',
-]
-
 const randomNudge = (): string => NUDGES[Math.floor(Math.random() * NUDGES.length)]
 
-interface IUseSmokeLoggerProps {
-  onSmoked: (updatedTimes: number[]) => void
-  onScheduled?: () => void
-}
-
-export default function useSmokeLogger({ onSmoked, onScheduled }: IUseSmokeLoggerProps) {
+export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLoggerProps) {
   const [nudge, setNudge] = useState<string>(NUDGES[0])
 
   const handleSmoke = useCallback(async (): Promise<void> => {

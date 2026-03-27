@@ -5,7 +5,7 @@ import StatsComparison from '@/components/StatsComparison'
 import WeekBarChart from '@/components/WeekBarChart'
 import useStatsData from '@/hooks/useStatsData'
 import { router } from 'expo-router'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type TView = 'WEEK' | 'MONTH'
@@ -28,25 +28,28 @@ export default function StatsScreen() {
     prevMonthStats,
   } = useStatsData(weekOffset)
 
-  const statCells: TStatCell[] = [
-    {
-      label: 'TODAY',
-      value: stats.todayCount,
-      unit: 'CIGS',
-      bg: '#fff',
-      isAbove: allTimeDailyAvg > 0 && stats.todayCount > allTimeDailyAvg,
-    },
-    {
-      label: 'TODAY GAP',
-      value: stats.avgGap,
-      unit: 'BETWEEN',
-      bg: '#fff',
-      isAbove:
-        todayAvgGapMinutes !== null && allTimeAvgGapMinutes !== null && todayAvgGapMinutes < allTimeAvgGapMinutes,
-    },
-    { label: 'DAILY AVG', value: allTimeDailyAvg, unit: 'CIGS/DAY', bg: '#F5F0E8' },
-    { label: 'AVG GAP', value: allTimeAvgGap, unit: 'ALL TIME', bg: '#F5F0E8' },
-  ]
+  const statCells: TStatCell[] = useMemo(
+    () => [
+      {
+        label: 'TODAY',
+        value: stats.todayCount,
+        unit: 'CIGS',
+        bg: '#fff',
+        isAbove: allTimeDailyAvg > 0 && stats.todayCount > allTimeDailyAvg,
+      },
+      {
+        label: 'TODAY GAP',
+        value: stats.avgGap,
+        unit: 'BETWEEN',
+        bg: '#fff',
+        isAbove:
+          todayAvgGapMinutes !== null && allTimeAvgGapMinutes !== null && todayAvgGapMinutes < allTimeAvgGapMinutes,
+      },
+      { label: 'DAILY AVG', value: allTimeDailyAvg, unit: 'CIGS/DAY', bg: '#F5F0E8' },
+      { label: 'AVG GAP', value: allTimeAvgGap, unit: 'ALL TIME', bg: '#F5F0E8' },
+    ],
+    [stats, allTimeDailyAvg, allTimeAvgGap, todayAvgGapMinutes, allTimeAvgGapMinutes],
+  )
 
   const handleDayPress = (dateStr: string) => {
     router.push({ pathname: '/history', params: { date: dateStr } })

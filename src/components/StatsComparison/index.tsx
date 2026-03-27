@@ -1,19 +1,5 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface IStatsComparisonData {
-  dailyAvg: number
-  avgGapMinutes: number | null
-  avgGapLabel: string
-}
-
-interface IStatsComparisonProps {
-  current: IStatsComparisonData
-  previous: IStatsComparisonData | null
-  periodLabel: string // e.g. "THIS WEEK" or "THIS MONTH"
-}
 // ─── Delta Pill ───────────────────────────────────────────────────────────────
 
 function DeltaPill({ current, previous, invert = false }: { current: number; previous: number; invert?: boolean }) {

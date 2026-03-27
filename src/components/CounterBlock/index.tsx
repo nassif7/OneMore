@@ -1,13 +1,8 @@
+import { CounterBlockProps } from '@/types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-interface ICounterBlockProps {
-  count: number
-  avgGap: string
-  timeSinceLast: string
-}
-
-export default function CounterBlock({ count, avgGap, timeSinceLast }: ICounterBlockProps) {
+export default function CounterBlock({ count, avgGap, timeSinceLast }: CounterBlockProps) {
   return (
     <View style={styles.container}>
       {/* Count */}

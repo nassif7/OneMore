@@ -1,11 +1,7 @@
-import { NUDGES } from '@/services/notifications'
+import { NUDGES } from '@/constants'
+import { NudgeBoxProps } from '@/types'
 import React, { useMemo } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-
-interface INudgeBoxProps {
-  nextNotificationTime: number | null
-  nextNotificationBody: string | null
-}
 
 function formatTimeUntil(ms: number): string {
   const totalMinutes = Math.round(ms / 60000)
@@ -16,7 +12,7 @@ function formatTimeUntil(ms: number): string {
   return m > 0 ? `${h}H ${m}M` : `${h}H`
 }
 
-export default function NudgeBox({ nextNotificationTime, nextNotificationBody }: INudgeBoxProps) {
+export default function NudgeBox({ nextNotificationTime, nextNotificationBody }: NudgeBoxProps) {
   const fallbackNudge = useMemo(() => NUDGES[Math.floor(Math.random() * NUDGES.length)], [])
 
   const timeUntil = nextNotificationTime !== null ? formatTimeUntil(nextNotificationTime - Date.now()) : null

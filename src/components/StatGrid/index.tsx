@@ -1,22 +1,8 @@
+import { StatGridProps } from '@/types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type TStatCell = {
-  label: string
-  value: string | number
-  unit: string
-  bg: string
-  color?: string
-  isAbove?: boolean
-}
-
-interface IStatGridProps {
-  stats: TStatCell[]
-}
-
-export default function StatGrid({ stats }: IStatGridProps) {
+export default function StatGrid({ stats }: StatGridProps) {
   return (
     <View style={styles.grid}>
       {stats.map((s, i) => {

@@ -4,9 +4,10 @@ import NudgeBox from '@/components/NudgeBox'
 import SmokeButton from '@/components/SmokeButton'
 import useSmokeLogger from '@/hooks/useSmokeLogger'
 import useTodayTimes from '@/hooks/useTodayTimes'
-import { computePattern, getNextNotificationBody, getNextNotificationTime } from '@/services/notifications'
+import { getNextNotificationBody, getNextNotificationTime } from '@/services/notifications'
+import { computePattern } from '@/services/patternCalculator'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 export default function HomeScreen() {
@@ -36,11 +37,14 @@ export default function HomeScreen() {
   })
 
   const count = times.length
-  const avgGap = getAvgGap(times)
-  const timeSinceLast = getTimeSinceLast(times)
+  const avgGap = useMemo(() => getAvgGap(times), [times])
+  const timeSinceLast = useMemo(() => getTimeSinceLast(times), [times])
   const lastTs = times.length > 0 ? times[times.length - 1] : null
-  const timeSinceLastMs = lastTs !== null ? Date.now() - lastTs : null
-  const gapRatio = timeSinceLastMs !== null && avgGapMs !== null ? timeSinceLastMs / avgGapMs : null
+  const timeSinceLastMs = useMemo(() => (lastTs !== null ? Date.now() - lastTs : null), [lastTs])
+  const gapRatio = useMemo(
+    () => (timeSinceLastMs !== null && avgGapMs !== null ? timeSinceLastMs / avgGapMs : null),
+    [timeSinceLastMs, avgGapMs],
+  )
 
   return (
     <View style={styles.container}>

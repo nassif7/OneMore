@@ -1,12 +1,7 @@
+import { ScreenHeaderProps } from '@/types'
 import { router } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-
-interface IScreenHeaderProps {
-  showBack?: boolean
-  title?: string
-  showSubtitle?: boolean
-}
 
 const getDateStrings = () => {
   const now = new Date()
@@ -15,11 +10,7 @@ const getDateStrings = () => {
   return { weekday, date }
 }
 
-export default function ScreenHeader({
-  showBack = false,
-  title = 'ONEMORE',
-  showSubtitle = false,
-}: IScreenHeaderProps) {
+export default function ScreenHeader({ showBack = false, title = 'ONEMORE', showSubtitle = false }: ScreenHeaderProps) {
   const { weekday, date } = getDateStrings()
 
   return (
