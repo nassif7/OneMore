@@ -4,7 +4,7 @@ import NudgeBox from '@/components/NudgeBox'
 import SmokeButton from '@/components/SmokeButton'
 import useSmokeLogger from '@/hooks/useSmokeLogger'
 import useTodayTimes from '@/hooks/useTodayTimes'
-import { getNextNotificationBody, getNextNotificationTime } from '@/services/notifications'
+import { getNextNotificationTime } from '@/services/notifications'
 import { computePattern } from '@/services/patternCalculator'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -13,18 +13,12 @@ import { StyleSheet, View } from 'react-native'
 export default function HomeScreen() {
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
   const [nextNotificationTime, setNextNotificationTime] = useState<number | null>(null)
-  const [nextNotificationBody, setNextNotificationBody] = useState<string | null>(null)
   const { times, setTimes } = useTodayTimes()
 
   const loadNudgeData = useCallback(async () => {
-    const [pattern, time, body] = await Promise.all([
-      computePattern(),
-      getNextNotificationTime(),
-      getNextNotificationBody(),
-    ])
+    const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
     setAvgGapMs(pattern.avgGapMs)
     setNextNotificationTime(time)
-    setNextNotificationBody(body)
   }, [])
 
   useEffect(() => {
@@ -50,7 +44,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <ScreenHeader />
       <CounterBlock count={count} avgGap={avgGap} timeSinceLast={timeSinceLast} />
-      <NudgeBox nextNotificationTime={nextNotificationTime} nextNotificationBody={nextNotificationBody} />
+      <NudgeBox nextNotificationTime={nextNotificationTime} nudge={nudge} />
       <SmokeButton onPress={handleSmoke} />
       <BottomNav />
     </View>

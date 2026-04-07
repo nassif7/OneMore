@@ -25,6 +25,7 @@ export default function TimePickerSheet({ visible, value, onChange, onSave, onCl
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(_, date) => date && onChange(date)}
           style={styles.picker}
+          textColor="#000"
         />
       </View>
     </Modal>

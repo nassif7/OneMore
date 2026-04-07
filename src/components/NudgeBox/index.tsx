@@ -12,12 +12,12 @@ function formatTimeUntil(ms: number): string {
   return m > 0 ? `${h}H ${m}M` : `${h}H`
 }
 
-export default function NudgeBox({ nextNotificationTime, nextNotificationBody }: NudgeBoxProps) {
+export default function NudgeBox({ nextNotificationTime, nudge }: NudgeBoxProps) {
   const fallbackNudge = useMemo(() => NUDGES[Math.floor(Math.random() * NUDGES.length)], [])
 
   const timeUntil = nextNotificationTime !== null ? formatTimeUntil(nextNotificationTime - Date.now()) : null
 
-  const body = nextNotificationBody ?? fallbackNudge
+  const body = nudge ?? fallbackNudge
 
   return (
     <View style={styles.container}>

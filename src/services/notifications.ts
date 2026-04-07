@@ -35,14 +35,3 @@ export const getNextNotificationTime = async (): Promise<number | null> => {
 export const getNextNotificationBody = async (): Promise<string | null> => {
   return AsyncStorage.getItem(NEXT_NOTIF_BODY_KEY)
 }
-
-// ─── Readers ──────────────────────────────────────────────────────────────────
-
-export const getNextNotificationTime = async (): Promise<number | null> => {
-  const val = await AsyncStorage.getItem(NEXT_NOTIF_TIME_KEY)
-  return val ? parseInt(val, 10) : null
-}
-
-export const getNextNotificationBody = async (): Promise<string | null> => {
-  return AsyncStorage.getItem(NEXT_NOTIF_BODY_KEY)
-}

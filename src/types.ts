@@ -50,7 +50,7 @@ export interface MonthCalendarProps {
 
 export interface NudgeBoxProps {
   nextNotificationTime: number | null
-  nextNotificationBody: string | null
+  nudge: string | null
 }
 
 export interface NudgeTickerProps {
