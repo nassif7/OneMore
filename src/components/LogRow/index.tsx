@@ -1,40 +1,20 @@
-import { Edit2, Trash } from "lucide-react-native";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { getGapColor, formatGap } from "@/helpers";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ILogRowProps {
-  index: number;
-  timestamp: number;
-  time: string;
-  gapMs: number | null;
-  avgGapMs: number | null;
-  onEdit: (ts: number) => void;
-  onDelete: (ts: number) => void;
-}
+import { formatGap, getGapColor } from '@/helpers'
+import { LogRowProps } from '@/types'
+import { Edit2, Trash } from 'lucide-react-native'
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Log Row ──────────────────────────────────────────────────────────────────
 
-export default function LogRow({
-  index,
-  timestamp,
-  time,
-  gapMs,
-  avgGapMs,
-  onEdit,
-  onDelete,
-}: ILogRowProps) {
-  const ratio =
-    gapMs !== null && avgGapMs !== null && gapMs > 0 ? gapMs / avgGapMs : null;
+export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit, onDelete }: LogRowProps) {
+  const ratio = gapMs !== null && avgGapMs !== null && gapMs > 0 ? gapMs / avgGapMs : null
 
-  const color = getGapColor(ratio);
+  const color = getGapColor(ratio)
 
-  const isColored = color !== "#F5F0E8";
-  const textColor = isColored ? "#fff" : "#000";
-  const subTextColor = isColored ? "rgba(255,255,255,0.7)" : "#666";
-  const indexColor = isColored ? "rgba(255,255,255,0.5)" : "#999";
+  const isColored = color !== '#F5F0E8'
+  const textColor = isColored ? '#fff' : '#000'
+  const subTextColor = isColored ? 'rgba(255,255,255,0.7)' : '#666'
+  const indexColor = isColored ? 'rgba(255,255,255,0.5)' : '#999'
 
   return (
     <View style={[styles.container, { backgroundColor: color }]}>
@@ -44,11 +24,7 @@ export default function LogRow({
       {/* Time + gap */}
       <View style={styles.main}>
         <Text style={[styles.time, { color: textColor }]}>{time}</Text>
-        {gapMs !== null && (
-          <Text style={[styles.gap, { color: subTextColor }]}>
-            +{formatGap(gapMs)} since last
-          </Text>
-        )}
+        {gapMs !== null && <Text style={[styles.gap, { color: subTextColor }]}>+{formatGap(gapMs)} since last</Text>}
       </View>
 
       {/* Actions */}
@@ -69,25 +45,25 @@ export default function LogRow({
         </TouchableOpacity>
       </View>
     </View>
-  );
+  )
 }
 
-LogRow.displayName = "LogRow";
+LogRow.displayName = 'LogRow'
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 2,
-    borderColor: "#000",
+    borderColor: '#000',
     paddingVertical: 14,
     paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
   index: {
-    fontFamily: "SpaceMono",
+    fontFamily: 'SpaceMono',
     fontSize: 9,
     letterSpacing: 1,
     width: 24,
@@ -97,23 +73,23 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   time: {
-    fontFamily: "BebasNeue",
+    fontFamily: 'BebasNeue',
     fontSize: 28,
     letterSpacing: 2,
     lineHeight: 28,
   },
   gap: {
-    fontFamily: "SpaceMono",
+    fontFamily: 'SpaceMono',
     fontSize: 9,
     letterSpacing: 1,
   },
   actions: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 16,
-    alignItems: "center",
+    alignItems: 'center',
   },
   actionButton: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-});
+})

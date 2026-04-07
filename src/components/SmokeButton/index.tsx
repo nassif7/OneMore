@@ -1,23 +1,12 @@
-import React, { useRef } from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ISmokeButtonProps {
-  onPress: () => Promise<void>;
-}
+import { SmokeButtonProps } from '@/types'
+import React, { useRef } from 'react'
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Smoke Button ─────────────────────────────────────────────────────────────
 
-export default function SmokeButton({ onPress }: ISmokeButtonProps) {
-  const buttonScale = useRef(new Animated.Value(1)).current;
-  const flashOpacity = useRef(new Animated.Value(0)).current;
+export default function SmokeButton({ onPress }: SmokeButtonProps) {
+  const buttonScale = useRef(new Animated.Value(1)).current
+  const flashOpacity = useRef(new Animated.Value(0)).current
 
   const handlePress = async (): Promise<void> => {
     // Button slam
@@ -33,7 +22,7 @@ export default function SmokeButton({ onPress }: ISmokeButtonProps) {
         damping: 4,
         stiffness: 300,
       }),
-    ]).start();
+    ]).start()
 
     // Fire flash
     Animated.sequence([
@@ -47,21 +36,17 @@ export default function SmokeButton({ onPress }: ISmokeButtonProps) {
         duration: 350,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start()
 
-    await onPress();
-  };
+    await onPress()
+  }
 
   return (
     <>
       <View style={styles.container}>
         <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-          <TouchableOpacity
-            onPress={handlePress}
-            activeOpacity={0.85}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>{"+\nONE MORE"}</Text>
+          <TouchableOpacity onPress={handlePress} activeOpacity={0.85} style={styles.button}>
+            <Text style={styles.buttonText}>{'+\nONE MORE'}</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -69,46 +54,43 @@ export default function SmokeButton({ onPress }: ISmokeButtonProps) {
       {/* Fire flash overlay — covers full screen */}
       <Animated.View
         pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: "#FF4500", opacity: flashOpacity },
-        ]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: '#FF4500', opacity: flashOpacity }]}
       />
     </>
-  );
+  )
 }
 
-SmokeButton.displayName = "SmokeButton";
+SmokeButton.displayName = 'SmokeButton'
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   button: {
     width: 200,
     height: 200,
     borderRadius: 100,
     borderWidth: 3,
-    borderColor: "#000",
-    backgroundColor: "#FF4500",
-    shadowColor: "#000",
+    borderColor: '#000',
+    backgroundColor: '#FF4500',
+    shadowColor: '#000',
     shadowOffset: { width: 6, height: 6 },
     shadowOpacity: 1,
     shadowRadius: 0,
     elevation: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
-    fontFamily: "BebasNeue",
+    fontFamily: 'BebasNeue',
     fontSize: 30,
-    color: "#fff",
+    color: '#fff',
     letterSpacing: 3,
-    textAlign: "center",
+    textAlign: 'center',
     lineHeight: 34,
   },
-});
+})
