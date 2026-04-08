@@ -1,6 +1,6 @@
 import { DayNavigatorProps } from '@/types'
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Day Navigator ────────────────────────────────────────────────────────────
 
@@ -49,9 +49,16 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   arrowText: {
-    fontFamily: 'BebasNeue',
     fontSize: 24,
+    fontWeight: '900',
     color: '#000',
+    ...Platform.select({
+      android: {
+        textShadowColor: '#000',
+        textShadowOffset: { width: 0.8, height: 0 },
+        textShadowRadius: 0.01,
+      },
+    }),
   },
   arrowTextDisabled: {
     color: '#999',

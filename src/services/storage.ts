@@ -1,5 +1,6 @@
-import { DAY_PREFIX } from '@/constants'
+import { DAY_PREFIX, FIRST_CIG_NOTIF_KEY, NEXT_NOTIF_BODY_KEY, NEXT_NOTIF_TIME_KEY, PENDING_NOTIF_KEY } from '@/constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Notifications from 'expo-notifications'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -141,5 +142,24 @@ export const getAllDays = async (): Promise<Record<string, number[]>> => {
   } catch (error) {
     console.error('[Storage] Error getting all days:', error)
     throw new StorageError('Failed to get all days', error)
+  }
+}
+
+export const clearAllData = async (): Promise<void> => {
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync()
+    const allKeys = await AsyncStorage.getAllKeys()
+    const keysToRemove = allKeys.filter(
+      (k) =>
+        k.startsWith(DAY_PREFIX) ||
+        k === PENDING_NOTIF_KEY ||
+        k === NEXT_NOTIF_TIME_KEY ||
+        k === NEXT_NOTIF_BODY_KEY ||
+        k === FIRST_CIG_NOTIF_KEY,
+    )
+    if (keysToRemove.length > 0) await AsyncStorage.multiRemove(keysToRemove)
+  } catch (error) {
+    console.error('[Storage] Error clearing all data:', error)
+    throw new StorageError('Failed to clear all data', error)
   }
 }

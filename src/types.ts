@@ -61,6 +61,7 @@ export interface ScreenHeaderProps {
   showBack?: boolean
   title?: string
   showSubtitle?: boolean
+  onReset?: () => void
 }
 
 export interface SmokeButtonProps {

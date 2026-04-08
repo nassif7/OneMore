@@ -182,7 +182,7 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
 
       {/* Top bar */}
       <Animated.View style={[styles.barTop, barTopStyle]}>
-        <Text style={styles.barTicks}>/ / / / / / / / / / / / / / / / /</Text>
+        <Text style={styles.barTicks} numberOfLines={1}>/ / / / / / / / / / / / / / / / /</Text>
         <Text style={styles.barVersion}>v1.0</Text>
       </Animated.View>
 
@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: CREAM,
     letterSpacing: 4,
+    flexShrink: 1,
   },
   barVersion: {
     fontFamily: 'SpaceMono_700Bold',

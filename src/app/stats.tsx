@@ -4,6 +4,7 @@ import StatGrid, { TStatCell } from '@/components/StatGrid'
 import StatsComparison from '@/components/StatsComparison'
 import WeekBarChart from '@/components/WeekBarChart'
 import useStatsData from '@/hooks/useStatsData'
+import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import React, { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -55,9 +56,14 @@ export default function StatsScreen() {
     router.push({ pathname: '/history', params: { date: dateStr } })
   }
 
+  const handleReset = async () => {
+    await clearAllData()
+    router.replace('/')
+  }
+
   return (
     <View style={styles.container}>
-      <ScreenHeader showBack />
+      <ScreenHeader showBack onReset={handleReset} />
 
       <StatGrid stats={statCells} />
 

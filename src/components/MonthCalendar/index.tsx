@@ -1,7 +1,7 @@
 import { MonthCalendarProps } from '@/types'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar } from 'react-native-calendars'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -128,9 +128,16 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   navArrow: {
-    fontFamily: 'BebasNeue',
     fontSize: 24,
+    fontWeight: '900',
     color: '#000',
+    ...Platform.select({
+      android: {
+        textShadowColor: '#000',
+        textShadowOffset: { width: 0.8, height: 0 },
+        textShadowRadius: 0.01,
+      },
+    }),
   },
   navArrowDisabled: {
     color: '#ccc',
