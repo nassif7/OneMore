@@ -33,12 +33,6 @@ export default function HomeScreen() {
   const count = times.length
   const avgGap = useMemo(() => getAvgGap(times), [times])
   const timeSinceLast = useMemo(() => getTimeSinceLast(times), [times])
-  const lastTs = times.length > 0 ? times[times.length - 1] : null
-  const timeSinceLastMs = useMemo(() => (lastTs !== null ? Date.now() - lastTs : null), [lastTs])
-  const gapRatio = useMemo(
-    () => (timeSinceLastMs !== null && avgGapMs !== null ? timeSinceLastMs / avgGapMs : null),
-    [timeSinceLastMs, avgGapMs],
-  )
 
   return (
     <View style={styles.container}>
