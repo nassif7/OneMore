@@ -7,7 +7,7 @@ import useStatsData from '@/hooks/useStatsData'
 import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import React, { useMemo, useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type TView = 'WEEK' | 'MONTH'
 
@@ -57,8 +57,13 @@ export default function StatsScreen() {
   }
 
   const handleReset = async () => {
-    await clearAllData()
-    router.replace('/')
+    try {
+      await clearAllData()
+      router.replace('/')
+    } catch (error) {
+      console.error('[StatsScreen] Failed to reset data:', error)
+      Alert.alert('ERROR', 'Failed to reset. Please try again.')
+    }
   }
 
   return (

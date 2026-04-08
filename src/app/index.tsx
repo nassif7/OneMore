@@ -16,9 +16,13 @@ export default function HomeScreen() {
   const { times, setTimes } = useTodayTimes()
 
   const loadNudgeData = useCallback(async () => {
-    const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
-    setAvgGapMs(pattern.avgGapMs)
-    setNextNotificationTime(time)
+    try {
+      const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
+      setAvgGapMs(pattern.avgGapMs)
+      setNextNotificationTime(time)
+    } catch (error) {
+      console.error('[HomeScreen] Failed to load nudge data:', error)
+    }
   }, [])
 
   useEffect(() => {

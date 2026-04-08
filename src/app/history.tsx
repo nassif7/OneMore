@@ -10,7 +10,7 @@ import { formatTime } from '@/services/stats'
 import { clearAllData, deleteLog, editLog } from '@/services/storage'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 export default function HistoryScreen() {
   const { date } = useLocalSearchParams<{ date?: string }>()
@@ -29,16 +29,24 @@ export default function HistoryScreen() {
   const dateStr = toCalendarDateString(selectedDate)
 
   useEffect(() => {
-    computePattern().then((p) => setAvgGapMs(p.avgGapMs))
+    computePattern()
+      .then((p) => setAvgGapMs(p.avgGapMs))
+      .catch((error) => console.error('[HistoryScreen] Failed to load pattern:', error))
   }, [entry])
 
   const handleDelete = (ts: number) => setDeletingTs(ts)
 
   const handleDeleteConfirm = async () => {
     if (deletingTs === null) return
-    await deleteLog(selectedDate, deletingTs)
-    setDeletingTs(null)
-    reload()
+    try {
+      await deleteLog(selectedDate, deletingTs)
+      setDeletingTs(null)
+      reload()
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to delete log:', error)
+      Alert.alert('ERROR', 'Failed to delete. Please try again.')
+      setDeletingTs(null)
+    }
   }
 
   const handleEditOpen = (ts: number) => {
@@ -48,14 +56,25 @@ export default function HistoryScreen() {
 
   const handleEditSave = async () => {
     if (editingTs === null) return
-    await editLog(selectedDate, editingTs, editTime.getTime())
-    setEditingTs(null)
-    reload()
+    try {
+      await editLog(selectedDate, editingTs, editTime.getTime())
+      setEditingTs(null)
+      reload()
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to edit log:', error)
+      Alert.alert('ERROR', 'Failed to save. Please try again.')
+      setEditingTs(null)
+    }
   }
 
   const handleReset = async () => {
-    await clearAllData()
-    router.replace('/')
+    try {
+      await clearAllData()
+      router.replace('/')
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to reset data:', error)
+      Alert.alert('ERROR', 'Failed to reset. Please try again.')
+    }
   }
 
   return (
