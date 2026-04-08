@@ -10,7 +10,7 @@ import {
 } from '@/constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Notifications from 'expo-notifications'
-import { computePattern, PatternCalculatorError } from './patternCalculator'
+import { SmokingPattern } from './patternCalculator'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,20 +60,9 @@ export const cancelPendingNotification = async (): Promise<void> => {
  * Schedule next notification based on average gap between cigarettes.
  * Includes sleep-time cutoff to avoid scheduling during sleep hours.
  */
-export const scheduleNextNotification = async (lastCigTime: number): Promise<void> => {
+export const scheduleNextNotification = async (lastCigTime: number, pattern: SmokingPattern): Promise<void> => {
   try {
     await cancelPendingNotification()
-
-    let pattern
-    try {
-      pattern = await computePattern()
-    } catch (error) {
-      if (error instanceof PatternCalculatorError) {
-        console.error('[NotificationScheduler] Pattern calculation failed:', error)
-        return
-      }
-      throw error
-    }
 
     // Need at least one gap to schedule
     if (!pattern.avgGapMs) return
@@ -128,19 +117,8 @@ export const scheduleNextNotification = async (lastCigTime: number): Promise<voi
  * Schedule notification for first cigarette of the next day.
  * Scheduled at average time of first cigarette based on history.
  */
-export const scheduleFirstCigNotification = async (): Promise<void> => {
+export const scheduleFirstCigNotification = async (pattern: SmokingPattern): Promise<void> => {
   try {
-    let pattern
-    try {
-      pattern = await computePattern()
-    } catch (error) {
-      if (error instanceof PatternCalculatorError) {
-        console.error('[NotificationScheduler] Pattern calculation failed:', error)
-        return
-      }
-      throw error
-    }
-
     if (pattern.avgFirstCigMinutes === null) return
 
     const tomorrow = new Date()
