@@ -1,7 +1,8 @@
 import { MonthCalendarProps } from '@/types'
 import { router } from 'expo-router'
+import { ChevronLeft, ChevronRight } from 'lucide-react-native'
 import React, { useState } from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar } from 'react-native-calendars'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -58,11 +59,11 @@ export default function MonthCalendar({ monthData, dailyAvg }: MonthCalendarProp
       {/* Custom nav header — matches WeekBarChart */}
       <View style={styles.navRow}>
         <TouchableOpacity onPress={goPrev} style={styles.navBtn}>
-          <Text style={styles.navArrow}>←</Text>
+          <ChevronLeft size={24} color="#000" strokeWidth={3} />
         </TouchableOpacity>
         <Text style={styles.navTitle}>{formatMonthLabel(currentMonth)}</Text>
         <TouchableOpacity onPress={goNext} style={styles.navBtn} disabled={isCurrentMonth}>
-          <Text style={[styles.navArrow, isCurrentMonth && styles.navArrowDisabled]}>→</Text>
+          <ChevronRight size={24} color={isCurrentMonth ? '#ccc' : '#000'} strokeWidth={3} />
         </TouchableOpacity>
       </View>
 
@@ -126,21 +127,6 @@ const styles = StyleSheet.create({
   },
   navBtn: {
     padding: 4,
-  },
-  navArrow: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#000',
-    ...Platform.select({
-      android: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 0.8, height: 0 },
-        textShadowRadius: 0.01,
-      },
-    }),
-  },
-  navArrowDisabled: {
-    color: '#ccc',
   },
   navTitle: {
     fontFamily: 'SpaceMono',

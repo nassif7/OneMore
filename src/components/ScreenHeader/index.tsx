@@ -1,8 +1,9 @@
 import ConfirmModal from '@/components/ConfirmModal'
 import { ScreenHeaderProps } from '@/types'
 import { router } from 'expo-router'
+import { ArrowLeft, RotateCcw } from 'lucide-react-native'
 import React, { useState } from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const getDateStrings = () => {
   const now = new Date()
@@ -20,7 +21,7 @@ export default function ScreenHeader({ showBack = false, title = 'ONEMORE', show
       <View style={styles.left}>
         {showBack && (
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>←</Text>
+            <ArrowLeft size={20} color="#000" strokeWidth={3} />
           </TouchableOpacity>
         )}
         <View>
@@ -31,7 +32,7 @@ export default function ScreenHeader({ showBack = false, title = 'ONEMORE', show
       <View style={styles.right}>
         {onReset ? (
           <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.resetButton}>
-            <Text style={styles.resetButtonText}>↺</Text>
+            <RotateCcw size={18} color="#fff" strokeWidth={3} />
           </TouchableOpacity>
         ) : (
           <>
@@ -54,23 +55,6 @@ export default function ScreenHeader({ showBack = false, title = 'ONEMORE', show
 }
 
 ScreenHeader.displayName = 'ScreenHeader'
-
-const boldIcon = (color: string) =>
-  Platform.select({
-    android: {
-      fontSize: 20,
-      fontWeight: '900' as const,
-      color,
-      textShadowColor: color,
-      textShadowOffset: { width: 0.8, height: 0 },
-      textShadowRadius: 0.01,
-    },
-    default: {
-      fontSize: 20,
-      fontWeight: '900' as const,
-      color,
-    },
-  })
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +88,6 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     elevation: 4,
   },
-  backButtonText: boldIcon('#000'),
   appName: {
     fontFamily: 'BebasNeue',
     fontSize: 42,
@@ -144,5 +127,4 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     elevation: 8,
   },
-  resetButtonText: boldIcon('#fff'),
 })
