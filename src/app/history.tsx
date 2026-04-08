@@ -7,8 +7,8 @@ import { toCalendarDateString } from '@/helpers'
 import useHistoryData from '@/hooks/useHistoryData'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
-import { deleteLog, editLog } from '@/services/storage'
-import { useLocalSearchParams } from 'expo-router'
+import { clearAllData, deleteLog, editLog } from '@/services/storage'
+import { router, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
@@ -57,9 +57,14 @@ export default function HistoryScreen() {
     reload()
   }
 
+  const handleReset = async () => {
+    await clearAllData()
+    router.replace('/')
+  }
+
   return (
     <View style={styles.container}>
-      <ScreenHeader showBack />
+      <ScreenHeader showBack onReset={handleReset} />
       <DayNavigator
         label={entry?.label ?? ''}
         fullDate={entry?.fullDate ?? ''}

@@ -13,8 +13,8 @@ export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit
 
   const isColored = color !== '#F5F0E8'
   const textColor = isColored ? '#fff' : '#000'
-  const subTextColor = isColored ? 'rgba(255,255,255,0.7)' : '#666'
-  const indexColor = isColored ? 'rgba(255,255,255,0.5)' : '#999'
+  const subTextColor = isColored ? '#fff' : '#666'
+  const indexColor = isColored ? '#fff' : '#999'
 
   return (
     <View style={[styles.container, { backgroundColor: color }]}>
@@ -34,14 +34,14 @@ export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Edit2 size={16} color={textColor} strokeWidth={2} />
+          <Edit2 size={20} color={textColor} strokeWidth={3} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onDelete(timestamp)}
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Trash size={16} color={textColor} strokeWidth={2} />
+          <Trash size={20} color={textColor} strokeWidth={3} />
         </TouchableOpacity>
       </View>
     </View>
