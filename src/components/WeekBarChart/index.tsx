@@ -1,5 +1,5 @@
 import { WeekBarChartProps } from '@/types'
-import { ChevronLeft, ChevronRight } from 'lucide-react-native'
+import { ArrowLeft, ArrowRight } from 'lucide-react-native'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -24,11 +24,11 @@ export default function WeekBarChart({
       {/* Navigation header */}
       <View style={styles.navRow}>
         <TouchableOpacity onPress={onPrevWeek} style={styles.navBtn}>
-          <ChevronLeft size={24} color="#000" strokeWidth={3} />
+          <ArrowLeft size={24} color="#000" strokeWidth={3} />
         </TouchableOpacity>
         <Text style={styles.title}>{weekLabel}</Text>
         <TouchableOpacity onPress={onNextWeek} style={styles.navBtn} disabled={!canGoNext}>
-          <ChevronRight size={24} color={canGoNext ? '#000' : '#ccc'} strokeWidth={3} />
+          <ArrowRight size={24} color={canGoNext ? '#000' : '#ccc'} strokeWidth={3} />
         </TouchableOpacity>
       </View>
 

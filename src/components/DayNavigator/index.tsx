@@ -1,5 +1,5 @@
 import { DayNavigatorProps } from '@/types'
-import { ChevronLeft, ChevronRight } from 'lucide-react-native'
+import { ArrowLeft, ArrowRight } from 'lucide-react-native'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -9,7 +9,7 @@ export default function DayNavigator({ label, fullDate, isToday, onPrev, onNext,
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPrev} style={styles.arrowButton}>
-        <ChevronLeft size={28} color="#000" strokeWidth={3} />
+        <ArrowLeft size={24} color="#000" strokeWidth={3} />
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onCalendar} style={styles.dateButton}>
@@ -22,7 +22,7 @@ export default function DayNavigator({ label, fullDate, isToday, onPrev, onNext,
         style={[styles.arrowButton, isToday && styles.arrowButtonDisabled]}
         disabled={isToday}
       >
-        <ChevronRight size={28} color="#000" strokeWidth={3} />
+        <ArrowRight size={24} color="#000" strokeWidth={3} />
       </TouchableOpacity>
     </View>
   )

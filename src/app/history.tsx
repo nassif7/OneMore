@@ -18,7 +18,6 @@ export default function HistoryScreen() {
 
   const { entry, selectedDate, isToday, goToPrevDay, goToNextDay, goToDate, reload } = useHistoryData(initialDate)
 
-  // rest of the screen unchanged
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
   const [editingTs, setEditingTs] = useState<number | null>(null)

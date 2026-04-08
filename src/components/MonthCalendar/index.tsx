@@ -1,6 +1,6 @@
 import { MonthCalendarProps } from '@/types'
 import { router } from 'expo-router'
-import { ChevronLeft, ChevronRight } from 'lucide-react-native'
+import { ArrowLeft, ArrowRight } from 'lucide-react-native'
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar } from 'react-native-calendars'
@@ -59,11 +59,11 @@ export default function MonthCalendar({ monthData, dailyAvg }: MonthCalendarProp
       {/* Custom nav header — matches WeekBarChart */}
       <View style={styles.navRow}>
         <TouchableOpacity onPress={goPrev} style={styles.navBtn}>
-          <ChevronLeft size={24} color="#000" strokeWidth={3} />
+          <ArrowLeft size={24} color="#000" strokeWidth={3} />
         </TouchableOpacity>
         <Text style={styles.navTitle}>{formatMonthLabel(currentMonth)}</Text>
         <TouchableOpacity onPress={goNext} style={styles.navBtn} disabled={isCurrentMonth}>
-          <ChevronRight size={24} color={isCurrentMonth ? '#ccc' : '#000'} strokeWidth={3} />
+          <ArrowRight size={24} color={isCurrentMonth ? '#ccc' : '#000'} strokeWidth={3} />
         </TouchableOpacity>
       </View>
 
