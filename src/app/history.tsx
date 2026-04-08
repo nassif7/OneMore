@@ -1,4 +1,4 @@
-import { BottomNav, ScreenHeader } from '@/components'
+import { BottomNav, ConfirmModal, ScreenHeader } from '@/components'
 import CalendarSheet from '@/components/CalendarSheet'
 import DayNavigator from '@/components/DayNavigator'
 import LogRow from '@/components/LogRow'
@@ -10,7 +10,7 @@ import { formatTime } from '@/services/stats'
 import { clearAllData, deleteLog, editLog } from '@/services/storage'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 export default function HistoryScreen() {
   const { date } = useLocalSearchParams<{ date?: string }>()
@@ -23,6 +23,7 @@ export default function HistoryScreen() {
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
   const [editingTs, setEditingTs] = useState<number | null>(null)
   const [editTime, setEditTime] = useState<Date>(new Date())
+  const [deletingTs, setDeletingTs] = useState<number | null>(null)
 
   const times = useMemo(() => (entry?.times ? [...entry.times].reverse() : []), [entry?.times])
   const dateStr = toCalendarDateString(selectedDate)
@@ -31,18 +32,13 @@ export default function HistoryScreen() {
     computePattern().then((p) => setAvgGapMs(p.avgGapMs))
   }, [entry])
 
-  const handleDelete = (ts: number) => {
-    Alert.alert('DELETE LOG', `Remove the ${formatTime(ts)} log?`, [
-      { text: 'CANCEL', style: 'cancel' },
-      {
-        text: 'DELETE',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteLog(selectedDate, ts)
-          reload()
-        },
-      },
-    ])
+  const handleDelete = (ts: number) => setDeletingTs(ts)
+
+  const handleDeleteConfirm = async () => {
+    if (deletingTs === null) return
+    await deleteLog(selectedDate, deletingTs)
+    setDeletingTs(null)
+    reload()
   }
 
   const handleEditOpen = (ts: number) => {
@@ -113,6 +109,14 @@ export default function HistoryScreen() {
           setCalendarVisible(false)
         }}
         onClose={() => setCalendarVisible(false)}
+      />
+      <ConfirmModal
+        visible={deletingTs !== null}
+        title="DELETE LOG?"
+        body={`Remove the ${deletingTs ? formatTime(deletingTs) : ''} log?`}
+        confirmLabel="DELETE"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingTs(null)}
       />
       <BottomNav />
     </View>

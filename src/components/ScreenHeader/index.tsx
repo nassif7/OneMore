@@ -1,7 +1,8 @@
+import ConfirmModal from '@/components/ConfirmModal'
 import { ScreenHeaderProps } from '@/types'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
-import { Modal, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const getDateStrings = () => {
   const now = new Date()
@@ -40,28 +41,14 @@ export default function ScreenHeader({ showBack = false, title = 'ONEMORE', show
         )}
       </View>
 
-      <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <Pressable style={styles.overlay} onPress={() => setModalVisible(false)}>
-          <Pressable style={styles.modal} onPress={() => {}}>
-            <Text style={styles.modalTitle}>START OVER?</Text>
-            <Text style={styles.modalBody}>THIS WILL DELETE ALL YOUR DATA.{'\n'}NO GOING BACK.</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelText}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={() => {
-                  setModalVisible(false)
-                  onReset()
-                }}
-              >
-                <Text style={styles.confirmText}>RESET</Text>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <ConfirmModal
+        visible={modalVisible}
+        title="START OVER?"
+        body={'THIS WILL DELETE ALL YOUR DATA.\nNO GOING BACK.'}
+        confirmLabel="RESET"
+        onConfirm={() => { setModalVisible(false); onReset?.() }}
+        onCancel={() => setModalVisible(false)}
+      />
     </View>
   )
 }
@@ -158,74 +145,4 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   resetButtonText: boldIcon('#fff'),
-  // ─── Modal ───────────────────────────────────────────────────────────────────
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    backgroundColor: '#F5F0E8',
-    borderWidth: 3,
-    borderColor: '#000',
-    padding: 24,
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
-  },
-  modalTitle: {
-    fontFamily: 'BebasNeue',
-    fontSize: 32,
-    letterSpacing: 2,
-    color: '#000',
-    marginBottom: 12,
-  },
-  modalBody: {
-    fontFamily: 'SpaceMono',
-    fontSize: 11,
-    color: '#333',
-    lineHeight: 18,
-    marginBottom: 24,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    borderWidth: 3,
-    borderColor: '#000',
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  cancelText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 18,
-    letterSpacing: 1,
-    color: '#000',
-  },
-  confirmButton: {
-    flex: 1,
-    borderWidth: 3,
-    borderColor: '#000',
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  confirmText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 18,
-    letterSpacing: 1,
-    color: '#fff',
-  },
 })
