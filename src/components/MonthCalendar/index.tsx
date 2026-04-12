@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     borderColor: '#000',
   },
   dayCircleToday: {
-    backgroundColor: '#FF4500',
+    backgroundColor: '#C0392B',
   },
   dayText: {
     fontFamily: 'SpaceMono',

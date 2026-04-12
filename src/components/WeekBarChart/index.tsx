@@ -50,7 +50,7 @@ export default function WeekBarChart({
                     styles.bar,
                     {
                       height: barH,
-                      backgroundColor: d.isToday ? '#FF4500' : '#000',
+                      backgroundColor: d.isToday ? '#C0392B' : '#000',
                     },
                   ]}
                 />
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   barCountToday: {
-    color: '#FF4500',
+    color: '#C0392B',
   },
   barLabel: {
     fontFamily: 'SpaceMono',
@@ -126,6 +126,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   barLabelToday: {
-    color: '#FF4500',
+    color: '#C0392B',
   },
 })

@@ -6,7 +6,7 @@ export default function StatGrid({ stats }: StatGridProps) {
   return (
     <View style={styles.grid}>
       {stats.map((s, i) => {
-        const bg = s.isAbove ? '#FF4500' : s.bg
+        const bg = s.isAbove ? '#C0392B' : s.bg
         const textColor = s.isAbove ? '#fff' : s.color || '#000'
         const labelColor = s.isAbove ? 'rgba(255,255,255,0.7)' : s.color || '#666'
         const unitColor = s.isAbove ? 'rgba(255,255,255,0.6)' : s.color || '#999'

@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     fontFamily: 'BebasNeue',
     fontSize: 18,
     letterSpacing: 2,
-    color: '#FF4500',
+    color: '#C0392B',
   },
   picker: {
     width: '100%',

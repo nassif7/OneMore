@@ -7,8 +7,9 @@ import { toCalendarDateString } from '@/helpers'
 import useHistoryData from '@/hooks/useHistoryData'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
-import { clearAllData, deleteLog, editLog } from '@/services/storage'
-import { router, useLocalSearchParams } from 'expo-router'
+import { deleteLog, editLog } from '@/services/storage'
+import { router } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
@@ -66,19 +67,9 @@ export default function HistoryScreen() {
     }
   }
 
-  const handleReset = async () => {
-    try {
-      await clearAllData()
-      router.replace('/')
-    } catch (error) {
-      console.error('[HistoryScreen] Failed to reset data:', error)
-      Alert.alert('ERROR', 'Failed to reset. Please try again.')
-    }
-  }
-
   return (
     <View style={styles.container}>
-      <ScreenHeader showBack onReset={handleReset} />
+      <ScreenHeader showBack onAbout={() => router.push('/about')} />
       <DayNavigator
         label={entry?.label ?? ''}
         fullDate={entry?.fullDate ?? ''}

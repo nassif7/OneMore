@@ -10,7 +10,7 @@ function DeltaPill({ current, previous, invert = false }: { current: number; pre
   const arrow = delta > 0 ? '↑' : '↓'
   const sign = delta > 0 ? '+' : ''
   return (
-    <View style={[styles.pill, { backgroundColor: isGood ? '#000' : '#FF4500' }]}>
+    <View style={[styles.pill, { backgroundColor: isGood ? '#000' : '#C0392B' }]}>
       <Text style={styles.pillText}>{`${arrow} ${sign}${delta}%`}</Text>
     </View>
   )
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   cellValueAbove: {
-    color: '#FF4500',
+    color: '#C0392B',
   },
   pill: {
     paddingHorizontal: 6,

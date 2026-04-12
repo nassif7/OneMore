@@ -1,55 +1,36 @@
-import ConfirmModal from '@/components/ConfirmModal'
 import { ScreenHeaderProps } from '@/types'
 import { router } from 'expo-router'
-import { ArrowLeft, RotateCcw } from 'lucide-react-native'
-import React, { useState } from 'react'
+import { ArrowLeft, Settings } from 'lucide-react-native'
+import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const getDateStrings = () => {
-  const now = new Date()
-  const weekday = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
-  const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()
-  return { weekday, date }
-}
-
-export default function ScreenHeader({ showBack = false, title = 'ONEMORE', showSubtitle = false, onReset }: ScreenHeaderProps) {
-  const { weekday, date } = getDateStrings()
-  const [modalVisible, setModalVisible] = useState(false)
+export default function ScreenHeader({ showBack = false, showDate = false, onAbout }: ScreenHeaderProps) {
+  const today = new Date()
+  const dateStr = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()
 
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        {showBack && (
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        {showBack ? (
+          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
             <ArrowLeft size={20} color="#000" strokeWidth={3} />
           </TouchableOpacity>
-        )}
-        <View>
-          <Text style={styles.appName}>{title}</Text>
-          {showSubtitle && <Text style={styles.tagline}>NO GUILT. JUST COUNTS.</Text>}
-        </View>
-      </View>
-      <View style={styles.right}>
-        {onReset ? (
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.resetButton}>
-            <RotateCcw size={18} color="#fff" strokeWidth={3} />
-          </TouchableOpacity>
+        ) : showDate ? (
+          <Text style={styles.date}>{dateStr}</Text>
         ) : (
-          <>
-            <Text style={styles.dateText}>{weekday}</Text>
-            <Text style={styles.dateText}>{date}</Text>
-          </>
+          <View style={styles.iconPlaceholder} />
         )}
       </View>
 
-      <ConfirmModal
-        visible={modalVisible}
-        title="START OVER?"
-        body={'THIS WILL DELETE ALL YOUR DATA.\nNO GOING BACK.'}
-        confirmLabel="RESET"
-        onConfirm={() => { setModalVisible(false); onReset?.() }}
-        onCancel={() => setModalVisible(false)}
-      />
+      <View style={styles.right}>
+        {onAbout ? (
+          <TouchableOpacity onPress={onAbout} style={styles.iconButton}>
+            <Settings size={18} color="#000" strokeWidth={3} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.iconPlaceholder} />
+        )}
+      </View>
     </View>
   )
 }
@@ -65,22 +46,25 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     backgroundColor: '#fff',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
   },
   left: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
+    alignItems: 'center',
   },
-  backButton: {
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  iconButton: {
     width: 36,
     height: 36,
     borderWidth: 3,
     borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
     backgroundColor: '#F5F0E8',
     shadowColor: '#000',
     shadowOffset: { width: 3, height: 3 },
@@ -88,43 +72,14 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     elevation: 4,
   },
-  appName: {
-    fontFamily: 'BebasNeue',
-    fontSize: 42,
-    lineHeight: 42,
-    letterSpacing: 2,
-    color: '#000',
-  },
-  tagline: {
-    fontFamily: 'SpaceMono',
-    fontSize: 10,
-    color: '#555',
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  right: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  dateText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 13,
-    letterSpacing: 2,
-    color: '#000',
-  },
-  resetButton: {
+  iconPlaceholder: {
     width: 36,
     height: 36,
-    borderWidth: 3,
-    borderColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-    backgroundColor: '#c00',
-    shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
+  },
+  date: {
+    fontFamily: 'SpaceMono',
+    fontSize: 11,
+    letterSpacing: 1,
+    color: '#555',
   },
 })

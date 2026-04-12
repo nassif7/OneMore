@@ -59,9 +59,8 @@ export interface NudgeTickerProps {
 
 export interface ScreenHeaderProps {
   showBack?: boolean
-  title?: string
-  showSubtitle?: boolean
-  onReset?: () => void
+  showDate?: boolean
+  onAbout?: () => void
 }
 
 export interface SmokeButtonProps {

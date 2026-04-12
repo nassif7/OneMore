@@ -7,6 +7,7 @@ import useTodayTimes from '@/hooks/useTodayTimes'
 import { getNextNotificationTime } from '@/services/notifications'
 import { computePattern } from '@/services/patternCalculator'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
+import { router } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
@@ -40,7 +41,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader />
+      <ScreenHeader showDate onAbout={() => router.push('/about')} />
       <CounterBlock count={count} avgGap={avgGap} timeSinceLast={timeSinceLast} />
       <NudgeBox nextNotificationTime={nextNotificationTime} nudge={nudge} />
       <SmokeButton onPress={handleSmoke} />

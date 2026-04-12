@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   navTextActive: {
-    color: "#FF4500",
+    color: "#C0392B",
   },
 });
