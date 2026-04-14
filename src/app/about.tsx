@@ -1,6 +1,7 @@
 import { ConfirmModal, ScreenHeader } from '@/components'
 import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
 import { Coffee, RotateCcw } from 'lucide-react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Animated, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -58,14 +59,14 @@ export default function AboutScreen() {
         </TouchableOpacity>
 
           <View style={styles.terminal}>
-            <Text style={styles.intentionText}>{'> '}Built with intention, shipped with love</Text>
+            <Text style={styles.intentionText}>{'> '}Built with intention, shipped with hope</Text>
             <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>█</Animated.Text>
           </View>
 
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Made by n|N</Text>
-          <TouchableOpacity onPress={() => router.push('/privacy')}>
+          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://google.com')}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
