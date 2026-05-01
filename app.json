@@ -14,7 +14,10 @@
     },
     "ios": {
       "bundleIdentifier": "one.nassif.onemore",
-      "icon": "./assets/images/icon.png"
+      "icon": "./assets/images/icon.png",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "one.nassif.onemore",
