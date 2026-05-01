@@ -1,3 +1,4 @@
+import { StatsComparisonProps } from '@/types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 // ─── Delta Pill ───────────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ function StatCell({
 
 // ─── Stats Comparison ─────────────────────────────────────────────────────────
 
-export default function StatsComparison({ current, previous, periodLabel }: IStatsComparisonProps) {
+export default function StatsComparison({ current, previous, periodLabel }: StatsComparisonProps) {
   const dailyAvgAbove = previous !== null && current.dailyAvg > previous.dailyAvg
   // for gap: being BELOW previous gap is bad (smoking more frequently)
   const avgGapAbove =

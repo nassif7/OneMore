@@ -1,5 +1,6 @@
 import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue'
 import { SpaceMono_700Bold } from '@expo-google-fonts/space-mono'
+import { AnimatedSplashScreenProps } from '@/types'
 import React, { useEffect } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import Animated, {

@@ -1,6 +1,7 @@
 import { BottomNav, ScreenHeader } from '@/components'
 import MonthCalendar from '@/components/MonthCalendar'
-import StatGrid, { TStatCell } from '@/components/StatGrid'
+import StatGrid from '@/components/StatGrid'
+import { TStatCell } from '@/types'
 import StatsComparison from '@/components/StatsComparison'
 import WeekBarChart from '@/components/WeekBarChart'
 import useStatsData from '@/hooks/useStatsData'
