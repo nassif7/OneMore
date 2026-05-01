@@ -91,6 +91,20 @@ export const deleteLog = async (date: Date, timestamp: number): Promise<number[]
   }
 }
 
+export const addLog = async (date: Date, timestamp: number): Promise<number[]> => {
+  const key = keyForDate(date)
+  try {
+    const existing = await AsyncStorage.getItem(key)
+    const times = safeJsonParse(existing)
+    const updated = [...times, timestamp].sort((a, b) => a - b)
+    await AsyncStorage.setItem(key, JSON.stringify(updated))
+    return updated
+  } catch (error) {
+    console.error('[Storage] Error adding log:', error)
+    throw new StorageError('Failed to add log', error)
+  }
+}
+
 export const editLog = async (date: Date, oldTimestamp: number, newTimestamp: number): Promise<number[]> => {
   const key = keyForDate(date)
   try {

@@ -199,6 +199,16 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
             <Text style={styles.stampMore}>MORE</Text>
           </Animated.View>
 
+            {/* Cross - contained to red area above ticker */}
+          <View style={styles.crossArea}>
+            <Animated.View
+              style={[styles.crossH, { height: CROSS_THICK, marginTop: -CROSS_THICK / 2 }, crossHStyle]}
+            />
+            <Animated.View
+              style={[styles.crossV, { width: CROSS_THICK, marginLeft: -CROSS_THICK / 2 }, crossVStyle]}
+            />
+          </View>
+
           {/* Ticker strip at bottom of panel */}
           <Animated.View style={[styles.tickerStrip, tickerStripStyle]}>
             <Animated.View style={[styles.tickerInner, tickerScrollStyle]}>
@@ -210,30 +220,6 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
             </Animated.View>
           </Animated.View>
         </Animated.View>
-
-        {/* Cross / Plus */}
-        <View style={[styles.cross, { width: PANEL_SIZE * 0.9, height: PANEL_SIZE * 0.9 }]}>
-          <Animated.View
-            style={[
-              styles.crossH,
-              {
-                height: CROSS_THICK,
-                marginTop: -CROSS_THICK / 2,
-              },
-              crossHStyle,
-            ]}
-          />
-          <Animated.View
-            style={[
-              styles.crossV,
-              {
-                width: CROSS_THICK,
-                marginLeft: -CROSS_THICK / 2,
-              },
-              crossVStyle,
-            ]}
-          />
-        </View>
 
         {/* Title below panel */}
         <Animated.View style={[styles.titleWrap, { top: PANEL_SIZE + 18 }]}>
@@ -375,10 +361,12 @@ const styles = StyleSheet.create({
   },
 
   // Cross
-  cross: {
+  crossArea: {
     position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 40, // stops at the ticker strip
   },
   crossH: {
     position: 'absolute',
