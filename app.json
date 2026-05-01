@@ -8,13 +8,13 @@
     "scheme": "onemore",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "backgroundColor": "#F5F0E8",
       "resizeMode": "contain"
     },
     "ios": {
       "bundleIdentifier": "one.nassif.onemore",
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "package": "one.nassif.onemore",
@@ -49,6 +49,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ffdd7386-950d-4bbb-aaeb-095d105142da"
+      }
     }
   }
 }
