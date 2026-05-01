@@ -1,6 +1,7 @@
 import { DayNavigatorProps } from '@/types'
+import { ArrowLeft, ArrowRight } from 'lucide-react-native'
 import React from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Day Navigator ────────────────────────────────────────────────────────────
 
@@ -8,7 +9,7 @@ export default function DayNavigator({ label, fullDate, isToday, onPrev, onNext,
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPrev} style={styles.arrowButton}>
-        <Text style={styles.arrowText}>{'←'}</Text>
+        <ArrowLeft size={24} color="#000" strokeWidth={3} />
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onCalendar} style={styles.dateButton}>
@@ -21,7 +22,7 @@ export default function DayNavigator({ label, fullDate, isToday, onPrev, onNext,
         style={[styles.arrowButton, isToday && styles.arrowButtonDisabled]}
         disabled={isToday}
       >
-        <Text style={[styles.arrowText, isToday && styles.arrowTextDisabled]}>{'→'}</Text>
+        <ArrowRight size={24} color="#000" strokeWidth={3} />
       </TouchableOpacity>
     </View>
   )
@@ -47,21 +48,6 @@ const styles = StyleSheet.create({
   },
   arrowButtonDisabled: {
     opacity: 0.2,
-  },
-  arrowText: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#000',
-    ...Platform.select({
-      android: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 0.8, height: 0 },
-        textShadowRadius: 0.01,
-      },
-    }),
-  },
-  arrowTextDisabled: {
-    color: '#999',
   },
   dateButton: {
     flex: 1,

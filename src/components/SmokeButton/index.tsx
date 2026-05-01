@@ -54,7 +54,7 @@ export default function SmokeButton({ onPress }: SmokeButtonProps) {
       {/* Fire flash overlay — covers full screen */}
       <Animated.View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: '#FF4500', opacity: flashOpacity }]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: '#C0392B', opacity: flashOpacity }]}
       />
     </>
   )
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 3,
     borderColor: '#000',
-    backgroundColor: '#FF4500',
+    backgroundColor: '#C0392B',
     shadowColor: '#000',
     shadowOffset: { width: 6, height: 6 },
     shadowOpacity: 1,

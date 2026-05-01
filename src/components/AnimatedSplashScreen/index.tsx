@@ -13,7 +13,7 @@ import Animated, {
 
 // ─── Brand tokens ────────────────────────────────────────────────────────────
 const BG = '#F5F0E8'
-const RED = '#FF4500'
+const RED = '#C0392B'
 const BLACK = '#000000'
 const CREAM = '#F5F0E8'
 

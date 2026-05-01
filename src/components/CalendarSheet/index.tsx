@@ -26,15 +26,15 @@ export default function CalendarSheet({ visible, selectedDateStr, onDayPress, on
           maxDate={todayDateStr()}
           onDayPress={(day) => onDayPress(day.dateString)}
           markedDates={{
-            [selectedDateStr]: { selected: true, selectedColor: '#FF4500' },
+            [selectedDateStr]: { selected: true, selectedColor: '#C0392B' },
           }}
           theme={{
             backgroundColor: '#F5F0E8',
             calendarBackground: '#F5F0E8',
             textSectionTitleColor: '#000',
-            selectedDayBackgroundColor: '#FF4500',
+            selectedDayBackgroundColor: '#C0392B',
             selectedDayTextColor: '#fff',
-            todayTextColor: '#FF4500',
+            todayTextColor: '#C0392B',
             dayTextColor: '#000',
             textDisabledColor: '#ccc',
             arrowColor: '#000',

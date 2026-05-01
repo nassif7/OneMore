@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: 'BebasNeue',
     fontSize: 18,
-    color: '#FF4500',
+    color: '#C0392B',
     letterSpacing: 3,
   },
 })

@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     fontFamily: 'BebasNeue',
     fontSize: 22,
     letterSpacing: 2,
-    color: '#FF4500',
+    color: '#C0392B',
     flexShrink: 1,
   },
 })

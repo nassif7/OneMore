@@ -1,6 +1,7 @@
 import { WeekBarChartProps } from '@/types'
+import { ArrowLeft, ArrowRight } from 'lucide-react-native'
 import React from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -23,11 +24,11 @@ export default function WeekBarChart({
       {/* Navigation header */}
       <View style={styles.navRow}>
         <TouchableOpacity onPress={onPrevWeek} style={styles.navBtn}>
-          <Text style={styles.navArrow}>←</Text>
+          <ArrowLeft size={24} color="#000" strokeWidth={3} />
         </TouchableOpacity>
         <Text style={styles.title}>{weekLabel}</Text>
         <TouchableOpacity onPress={onNextWeek} style={styles.navBtn} disabled={!canGoNext}>
-          <Text style={[styles.navArrow, !canGoNext && styles.navArrowDisabled]}>→</Text>
+          <ArrowRight size={24} color={canGoNext ? '#000' : '#ccc'} strokeWidth={3} />
         </TouchableOpacity>
       </View>
 
@@ -49,7 +50,7 @@ export default function WeekBarChart({
                     styles.bar,
                     {
                       height: barH,
-                      backgroundColor: d.isToday ? '#FF4500' : '#000',
+                      backgroundColor: d.isToday ? '#C0392B' : '#000',
                     },
                   ]}
                 />
@@ -81,21 +82,6 @@ const styles = StyleSheet.create({
   },
   navBtn: {
     padding: 4,
-  },
-  navArrow: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#000',
-    ...Platform.select({
-      android: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 0.8, height: 0 },
-        textShadowRadius: 0.01,
-      },
-    }),
-  },
-  navArrowDisabled: {
-    color: '#ccc',
   },
   title: {
     fontFamily: 'SpaceMono',
@@ -131,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   barCountToday: {
-    color: '#FF4500',
+    color: '#C0392B',
   },
   barLabel: {
     fontFamily: 'SpaceMono',
@@ -140,6 +126,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   barLabelToday: {
-    color: '#FF4500',
+    color: '#C0392B',
   },
 })

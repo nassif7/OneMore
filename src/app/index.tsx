@@ -7,6 +7,7 @@ import useTodayTimes from '@/hooks/useTodayTimes'
 import { getNextNotificationTime } from '@/services/notifications'
 import { computePattern } from '@/services/patternCalculator'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
+import { router } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
@@ -16,9 +17,13 @@ export default function HomeScreen() {
   const { times, setTimes } = useTodayTimes()
 
   const loadNudgeData = useCallback(async () => {
-    const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
-    setAvgGapMs(pattern.avgGapMs)
-    setNextNotificationTime(time)
+    try {
+      const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
+      setAvgGapMs(pattern.avgGapMs)
+      setNextNotificationTime(time)
+    } catch (error) {
+      console.error('[HomeScreen] Failed to load nudge data:', error)
+    }
   }, [])
 
   useEffect(() => {
@@ -33,16 +38,10 @@ export default function HomeScreen() {
   const count = times.length
   const avgGap = useMemo(() => getAvgGap(times), [times])
   const timeSinceLast = useMemo(() => getTimeSinceLast(times), [times])
-  const lastTs = times.length > 0 ? times[times.length - 1] : null
-  const timeSinceLastMs = useMemo(() => (lastTs !== null ? Date.now() - lastTs : null), [lastTs])
-  const gapRatio = useMemo(
-    () => (timeSinceLastMs !== null && avgGapMs !== null ? timeSinceLastMs / avgGapMs : null),
-    [timeSinceLastMs, avgGapMs],
-  )
 
   return (
     <View style={styles.container}>
-      <ScreenHeader />
+      <ScreenHeader showDate onAbout={() => router.push('/about')} />
       <CounterBlock count={count} avgGap={avgGap} timeSinceLast={timeSinceLast} />
       <NudgeBox nextNotificationTime={nextNotificationTime} nudge={nudge} />
       <SmokeButton onPress={handleSmoke} />

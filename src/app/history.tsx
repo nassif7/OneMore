@@ -1,4 +1,4 @@
-import { BottomNav, ScreenHeader } from '@/components'
+import { BottomNav, ConfirmModal, ScreenHeader } from '@/components'
 import CalendarSheet from '@/components/CalendarSheet'
 import DayNavigator from '@/components/DayNavigator'
 import LogRow from '@/components/LogRow'
@@ -7,8 +7,9 @@ import { toCalendarDateString } from '@/helpers'
 import useHistoryData from '@/hooks/useHistoryData'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
-import { clearAllData, deleteLog, editLog } from '@/services/storage'
-import { router, useLocalSearchParams } from 'expo-router'
+import { deleteLog, editLog } from '@/services/storage'
+import { router } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
@@ -18,31 +19,34 @@ export default function HistoryScreen() {
 
   const { entry, selectedDate, isToday, goToPrevDay, goToNextDay, goToDate, reload } = useHistoryData(initialDate)
 
-  // rest of the screen unchanged
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
   const [editingTs, setEditingTs] = useState<number | null>(null)
   const [editTime, setEditTime] = useState<Date>(new Date())
+  const [deletingTs, setDeletingTs] = useState<number | null>(null)
 
   const times = useMemo(() => (entry?.times ? [...entry.times].reverse() : []), [entry?.times])
   const dateStr = toCalendarDateString(selectedDate)
 
   useEffect(() => {
-    computePattern().then((p) => setAvgGapMs(p.avgGapMs))
+    computePattern()
+      .then((p) => setAvgGapMs(p.avgGapMs))
+      .catch((error) => console.error('[HistoryScreen] Failed to load pattern:', error))
   }, [entry])
 
-  const handleDelete = (ts: number) => {
-    Alert.alert('DELETE LOG', `Remove the ${formatTime(ts)} log?`, [
-      { text: 'CANCEL', style: 'cancel' },
-      {
-        text: 'DELETE',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteLog(selectedDate, ts)
-          reload()
-        },
-      },
-    ])
+  const handleDelete = (ts: number) => setDeletingTs(ts)
+
+  const handleDeleteConfirm = async () => {
+    if (deletingTs === null) return
+    try {
+      await deleteLog(selectedDate, deletingTs)
+      setDeletingTs(null)
+      reload()
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to delete log:', error)
+      Alert.alert('ERROR', 'Failed to delete. Please try again.')
+      setDeletingTs(null)
+    }
   }
 
   const handleEditOpen = (ts: number) => {
@@ -52,19 +56,20 @@ export default function HistoryScreen() {
 
   const handleEditSave = async () => {
     if (editingTs === null) return
-    await editLog(selectedDate, editingTs, editTime.getTime())
-    setEditingTs(null)
-    reload()
-  }
-
-  const handleReset = async () => {
-    await clearAllData()
-    router.replace('/')
+    try {
+      await editLog(selectedDate, editingTs, editTime.getTime())
+      setEditingTs(null)
+      reload()
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to edit log:', error)
+      Alert.alert('ERROR', 'Failed to save. Please try again.')
+      setEditingTs(null)
+    }
   }
 
   return (
     <View style={styles.container}>
-      <ScreenHeader showBack onReset={handleReset} />
+      <ScreenHeader showBack onAbout={() => router.push('/about')} />
       <DayNavigator
         label={entry?.label ?? ''}
         fullDate={entry?.fullDate ?? ''}
@@ -113,6 +118,14 @@ export default function HistoryScreen() {
           setCalendarVisible(false)
         }}
         onClose={() => setCalendarVisible(false)}
+      />
+      <ConfirmModal
+        visible={deletingTs !== null}
+        title="DELETE LOG?"
+        body={`Remove the ${deletingTs ? formatTime(deletingTs) : ''} log?`}
+        confirmLabel="DELETE"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingTs(null)}
       />
       <BottomNav />
     </View>

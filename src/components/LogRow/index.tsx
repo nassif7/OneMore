@@ -1,6 +1,6 @@
 import { formatGap, getGapColor } from '@/helpers'
 import { LogRowProps } from '@/types'
-import { Edit2, Trash } from 'lucide-react-native'
+import { Pencil, Trash2 } from 'lucide-react-native'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -34,14 +34,14 @@ export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Edit2 size={20} color={textColor} strokeWidth={3} />
+          <Pencil size={20} color={textColor} strokeWidth={3} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onDelete(timestamp)}
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Trash size={20} color={textColor} strokeWidth={3} />
+          <Trash2 size={20} color={textColor} strokeWidth={3} />
         </TouchableOpacity>
       </View>
     </View>

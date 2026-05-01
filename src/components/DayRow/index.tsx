@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   containerToday: {
-    backgroundColor: '#FF4500',
+    backgroundColor: '#C0392B',
   },
   header: {
     flexDirection: 'row',

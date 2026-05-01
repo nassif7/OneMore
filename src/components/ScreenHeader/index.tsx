@@ -1,89 +1,41 @@
 import { ScreenHeaderProps } from '@/types'
 import { router } from 'expo-router'
-import React, { useState } from 'react'
-import { Modal, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ArrowLeft, Settings } from 'lucide-react-native'
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const getDateStrings = () => {
-  const now = new Date()
-  const weekday = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
-  const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()
-  return { weekday, date }
-}
-
-export default function ScreenHeader({ showBack = false, title = 'ONEMORE', showSubtitle = false, onReset }: ScreenHeaderProps) {
-  const { weekday, date } = getDateStrings()
-  const [modalVisible, setModalVisible] = useState(false)
+export default function ScreenHeader({ showBack = false, showDate = false, onAbout }: ScreenHeaderProps) {
+  const today = new Date()
+  const dateStr = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()
 
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        {showBack && (
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>←</Text>
+        {showBack ? (
+          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
+            <ArrowLeft size={20} color="#000" strokeWidth={3} />
           </TouchableOpacity>
-        )}
-        <View>
-          <Text style={styles.appName}>{title}</Text>
-          {showSubtitle && <Text style={styles.tagline}>NO GUILT. JUST COUNTS.</Text>}
-        </View>
-      </View>
-      <View style={styles.right}>
-        {onReset ? (
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.resetButton}>
-            <Text style={styles.resetButtonText}>↺</Text>
-          </TouchableOpacity>
+        ) : showDate ? (
+          <Text style={styles.date}>{dateStr}</Text>
         ) : (
-          <>
-            <Text style={styles.dateText}>{weekday}</Text>
-            <Text style={styles.dateText}>{date}</Text>
-          </>
+          <View style={styles.iconPlaceholder} />
         )}
       </View>
 
-      <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <Pressable style={styles.overlay} onPress={() => setModalVisible(false)}>
-          <Pressable style={styles.modal} onPress={() => {}}>
-            <Text style={styles.modalTitle}>START OVER?</Text>
-            <Text style={styles.modalBody}>THIS WILL DELETE ALL YOUR DATA.{'\n'}NO GOING BACK.</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelText}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={() => {
-                  setModalVisible(false)
-                  onReset()
-                }}
-              >
-                <Text style={styles.confirmText}>RESET</Text>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <View style={styles.right}>
+        {onAbout ? (
+          <TouchableOpacity onPress={onAbout} style={styles.iconButton}>
+            <Settings size={18} color="#000" strokeWidth={3} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.iconPlaceholder} />
+        )}
+      </View>
     </View>
   )
 }
 
 ScreenHeader.displayName = 'ScreenHeader'
-
-const boldIcon = (color: string) =>
-  Platform.select({
-    android: {
-      fontSize: 20,
-      fontWeight: '900' as const,
-      color,
-      textShadowColor: color,
-      textShadowOffset: { width: 0.8, height: 0 },
-      textShadowRadius: 0.01,
-    },
-    default: {
-      fontSize: 20,
-      fontWeight: '900' as const,
-      color,
-    },
-  })
 
 const styles = StyleSheet.create({
   container: {
@@ -94,138 +46,40 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     backgroundColor: '#fff',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
   },
   left: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderWidth: 3,
-    borderColor: '#000',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-    backgroundColor: '#F5F0E8',
-    shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  backButtonText: boldIcon('#000'),
-  appName: {
-    fontFamily: 'BebasNeue',
-    fontSize: 42,
-    lineHeight: 42,
-    letterSpacing: 2,
-    color: '#000',
-  },
-  tagline: {
-    fontFamily: 'SpaceMono',
-    fontSize: 10,
-    color: '#555',
-    letterSpacing: 1,
-    marginTop: 2,
   },
   right: {
-    alignItems: 'flex-end',
-    gap: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
-  dateText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 13,
-    letterSpacing: 2,
-    color: '#000',
-  },
-  resetButton: {
+  iconButton: {
     width: 36,
     height: 36,
     borderWidth: 3,
     borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
-    backgroundColor: '#c00',
-    shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
-  },
-  resetButtonText: boldIcon('#fff'),
-  // ─── Modal ───────────────────────────────────────────────────────────────────
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
     backgroundColor: '#F5F0E8',
-    borderWidth: 3,
-    borderColor: '#000',
-    padding: 24,
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
-  },
-  modalTitle: {
-    fontFamily: 'BebasNeue',
-    fontSize: 32,
-    letterSpacing: 2,
-    color: '#000',
-    marginBottom: 12,
-  },
-  modalBody: {
-    fontFamily: 'SpaceMono',
-    fontSize: 11,
-    color: '#333',
-    lineHeight: 18,
-    marginBottom: 24,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    borderWidth: 3,
-    borderColor: '#000',
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  cancelText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 18,
-    letterSpacing: 1,
-    color: '#000',
-  },
-  confirmButton: {
-    flex: 1,
-    borderWidth: 3,
-    borderColor: '#000',
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#000',
     shadowColor: '#000',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 1,
     shadowRadius: 0,
     elevation: 4,
   },
-  confirmText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 18,
+  iconPlaceholder: {
+    width: 36,
+    height: 36,
+  },
+  date: {
+    fontFamily: 'SpaceMono',
+    fontSize: 11,
     letterSpacing: 1,
-    color: '#fff',
+    color: '#555',
   },
 })

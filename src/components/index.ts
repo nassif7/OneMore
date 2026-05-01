@@ -1,4 +1,5 @@
 export { default as BottomNav } from "./BottomNav";
+export { default as ConfirmModal } from "./ConfirmModal";
 export { default as CounterBlock } from "./CounterBlock";
 export { default as DayRow } from "./DayRow";
 export { default as NudgeTicker } from "./NudgeTicker";

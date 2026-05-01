@@ -9,5 +9,5 @@
 export const getGapColor = (ratio: number | null): string => {
   if (ratio === null) return "#F5F0E8"; // default — no data
   if (ratio > 0.9) return "#F5F0E8"; // on avg or above — default bg
-  return "#DD0000"; // below avg — red
+  return "#C0392B"; // below avg — red
 };
