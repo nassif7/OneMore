@@ -1,4 +1,5 @@
 import { BottomNav, ConfirmModal, ScreenHeader } from '@/components'
+import { Plus } from 'lucide-react-native'
 import CalendarSheet from '@/components/CalendarSheet'
 import DayNavigator from '@/components/DayNavigator'
 import LogRow from '@/components/LogRow'
@@ -7,11 +8,11 @@ import { toCalendarDateString } from '@/helpers'
 import useHistoryData from '@/hooks/useHistoryData'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
-import { deleteLog, editLog } from '@/services/storage'
+import { addLog, deleteLog, editLog } from '@/services/storage'
 import { router } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export default function HistoryScreen() {
   const { date } = useLocalSearchParams<{ date?: string }>()
@@ -24,6 +25,8 @@ export default function HistoryScreen() {
   const [editingTs, setEditingTs] = useState<number | null>(null)
   const [editTime, setEditTime] = useState<Date>(new Date())
   const [deletingTs, setDeletingTs] = useState<number | null>(null)
+  const [isAdding, setIsAdding] = useState<boolean>(false)
+  const [addTime, setAddTime] = useState<Date>(new Date())
 
   const times = useMemo(() => (entry?.times ? [...entry.times].reverse() : []), [entry?.times])
   const dateStr = toCalendarDateString(selectedDate)
@@ -33,6 +36,23 @@ export default function HistoryScreen() {
       .then((p) => setAvgGapMs(p.avgGapMs))
       .catch((error) => console.error('[HistoryScreen] Failed to load pattern:', error))
   }, [entry])
+
+  const handleAddOpen = () => {
+    setAddTime(new Date(selectedDate))
+    setIsAdding(true)
+  }
+
+  const handleAddSave = async () => {
+    try {
+      await addLog(selectedDate, addTime.getTime())
+      setIsAdding(false)
+      reload()
+    } catch (error) {
+      console.error('[HistoryScreen] Failed to add log:', error)
+      Alert.alert('ERROR', 'Failed to add. Please try again.')
+      setIsAdding(false)
+    }
+  }
 
   const handleDelete = (ts: number) => setDeletingTs(ts)
 
@@ -78,6 +98,10 @@ export default function HistoryScreen() {
         onNext={goToNextDay}
         onCalendar={() => setCalendarVisible(true)}
       />
+      <TouchableOpacity onPress={handleAddOpen} style={styles.addRow}>
+        <Plus size={16} color="#000" strokeWidth={3} />
+        <Text style={styles.addRowLabel}>ADD CIG</Text>
+      </TouchableOpacity>
       <ScrollView showsVerticalScrollIndicator={false}>
         {times.length === 0 && (
           <View style={styles.emptyState}>
@@ -110,6 +134,13 @@ export default function HistoryScreen() {
         onSave={handleEditSave}
         onClose={() => setEditingTs(null)}
       />
+      <TimePickerSheet
+        visible={isAdding}
+        value={addTime}
+        onChange={setAddTime}
+        onSave={handleAddSave}
+        onClose={() => setIsAdding(false)}
+      />
       <CalendarSheet
         visible={calendarVisible}
         selectedDateStr={dateStr}
@@ -136,6 +167,22 @@ HistoryScreen.displayName = 'HistoryScreen'
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F0E8' },
+  addRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 3,
+    borderColor: '#000',
+    backgroundColor: '#fff',
+  },
+  addRowLabel: {
+    fontFamily: 'BebasNeue',
+    fontSize: 20,
+    letterSpacing: 2,
+    color: '#000',
+  },
   emptyState: { padding: 40, alignItems: 'center', gap: 8 },
   emptyTitle: {
     fontFamily: 'BebasNeue',
