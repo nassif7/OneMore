@@ -9,8 +9,8 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
-      "backgroundColor": "#F5F0E8",
-      "resizeMode": "contain"
+      "backgroundColor": "#B43A2D",
+      "resizeMode": "cover"
     },
     "ios": {
       "bundleIdentifier": "one.nassif.onemore",
@@ -22,7 +22,7 @@
     "android": {
       "package": "one.nassif.onemore",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#B43A2D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -30,21 +30,11 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "static"
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#208AEF",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
-        }
-      ],
+      "expo-splash-screen",
       "expo-font",
       "expo-web-browser",
       "@react-native-community/datetimepicker"
