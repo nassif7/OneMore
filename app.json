@@ -46,8 +46,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "ffdd7386-950d-4bbb-aaeb-095d105142da"
+        "projectId": "ab683ba2-0c69-4f4c-95a0-2414daa9fcca"
       }
-    }
+    },
+    "owner": "nassif.pro"
   }
 }
