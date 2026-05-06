@@ -5,7 +5,8 @@ import {
 } from "@/services/notifications";
 import { BebasNeue_400Regular, useFonts } from "@expo-google-fonts/bebas-neue";
 import { SpaceMono_700Bold } from "@expo-google-fonts/space-mono";
-import { Slot } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { router, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
 import { useEffect, useState } from "react";
@@ -28,6 +29,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     requestNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener(() => {
+      router.replace("/");
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {

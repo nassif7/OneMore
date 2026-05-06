@@ -11,9 +11,16 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 
 type TView = 'WEEK' | 'MONTH'
 
+let savedView: TView = 'WEEK'
+
 export default function StatsScreen() {
   const [weekOffset, setWeekOffset] = useState(0)
-  const [view, setView] = useState<TView>('WEEK')
+  const [view, setView] = useState<TView>(savedView)
+
+  const handleViewChange = (v: TView) => {
+    savedView = v
+    setView(v)
+  }
   const {
     weekData,
     stats,
@@ -67,7 +74,7 @@ export default function StatsScreen() {
         {(['WEEK', 'MONTH'] as TView[]).map((v) => (
           <TouchableOpacity
             key={v}
-            onPress={() => setView(v)}
+            onPress={() => handleViewChange(v)}
             style={[styles.toggleBtn, view === v && styles.toggleBtnActive]}
           >
             <Text style={[styles.toggleText, view === v && styles.toggleTextActive]}>{v}</Text>
