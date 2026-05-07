@@ -1,6 +1,7 @@
 import { Href, router, usePathname } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TNavItem = {
   id: string;
@@ -16,9 +17,10 @@ const NAV_ITEMS: TNavItem[] = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { bottom } = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottom }]}>
       {NAV_ITEMS.map((item, i) => {
         const isActive = pathname === item.route;
         const isLast = i === NAV_ITEMS.length - 1;
