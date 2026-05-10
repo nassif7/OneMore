@@ -66,7 +66,7 @@ export default function AboutScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Made by n|N</Text>
-          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://google.com')}>
+          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://www.nassif.pro/projects/one-more/privacy')}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
