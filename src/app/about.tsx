@@ -4,12 +4,14 @@ import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { Coffee, RotateCcw } from 'lucide-react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Animated, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const KOFI_URL = 'https://ko-fi.com/nn498137'
 
 export default function AboutScreen() {
   const [resetVisible, setResetVisible] = useState(false)
+  const { bottom } = useSafeAreaInsets()
   const cursorOpacity = useRef(new Animated.Value(1)).current
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function AboutScreen() {
           </View>
 
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { bottom: 32 + (Platform.OS === 'android' ? bottom : 0) }]}>
           <Text style={styles.footerText}>Made by n|N</Text>
           <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://www.nassif.pro/projects/one-more/privacy')}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
@@ -181,7 +183,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 32,
     left: 20,
     right: 20,
     flexDirection: 'row',

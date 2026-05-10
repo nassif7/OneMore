@@ -152,8 +152,8 @@ export default function HistoryScreen() {
       />
       <ConfirmModal
         visible={deletingTs !== null}
-        title="DELETE LOG?"
-        body={`Remove the ${deletingTs ? formatTime(deletingTs) : ''} log?`}
+        title="DELETE CIG?"
+        body={`Remove the ${deletingTs ? formatTime(deletingTs) : ''} cig?`}
         confirmLabel="DELETE"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingTs(null)}
