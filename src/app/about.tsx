@@ -60,13 +60,14 @@ export default function AboutScreen() {
           <Text style={styles.resetText}>RESET ALL DATA</Text>
         </TouchableOpacity>
 
-          <View style={styles.terminal}>
-            <Text style={styles.intentionText}>{'> '}Built with intention, shipped with hope</Text>
-            <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>█</Animated.Text>
-          </View>
+        <View style={{ flex: 1 }} />
 
+        <View style={styles.terminal}>
+          <Text style={styles.intentionText}>{'> '}Built with intention, shipped with hope</Text>
+          <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>█</Animated.Text>
+        </View>
 
-        <View style={[styles.footer, { bottom: 32 + (Platform.OS === 'android' ? bottom : 0) }]}>
+        <View style={[styles.footer, { paddingBottom: 32 + (Platform.OS === 'android' ? bottom : 0) }]}>
           <Text style={styles.footerText}>Made by n|N</Text>
           <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://www.nassif.pro/projects/one-more/privacy')}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
@@ -182,9 +183,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   footer: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -196,10 +194,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   terminal: {
-    position: 'absolute',
-    bottom: 64,
-    left: 20,
-    right: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
