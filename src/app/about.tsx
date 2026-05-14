@@ -2,12 +2,12 @@ import { ConfirmModal, ScreenHeader } from '@/components'
 import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
-import { Coffee, RotateCcw } from 'lucide-react-native'
+import { Globe, RotateCcw } from 'lucide-react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const KOFI_URL = 'https://ko-fi.com/nn498137'
+const PROJECTS_URL = 'https://nassif.pro/projects'
 
 export default function AboutScreen() {
   const [resetVisible, setResetVisible] = useState(false)
@@ -48,12 +48,10 @@ export default function AboutScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.kofiButton} onPress={() => Linking.openURL(KOFI_URL)}>
-          <Coffee size={18} color="#fff" strokeWidth={2.5} />
-          <Text style={styles.kofiText}>BUY ME A COFFEE</Text>
+        <TouchableOpacity style={styles.kofiButton} onPress={() => Linking.openURL(PROJECTS_URL)}>
+          <Globe size={18} color="#fff" strokeWidth={2.5} />
+          <Text style={styles.kofiText}>MORE FROM THE DEVELOPER</Text>
         </TouchableOpacity>
-
-        <Text style={styles.kofiSub}>If the app is useful to you, a coffee goes a long way.</Text>
 
         <TouchableOpacity style={styles.resetButton} onPress={() => setResetVisible(true)}>
           <RotateCcw size={18} color="#fff" strokeWidth={3} />
