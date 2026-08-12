@@ -20,6 +20,11 @@ export const NUDGES = [
   'FEELING THAT ITCH?',
   'YOUR LUNGS CALLED. THEY MISS YOU.',
   'ACCOUNTABILITY? NEVER HEARD OF HER.',
+  'AGAIN? BOLD.',
+  'NOT COUNTING. OKAY, COUNTING.',
+  'STATISTICALLY UNSURPRISING.',
+  "WELL, YOU'RE HERE NOW.",
+  'THE HABIT HABIT.',
 ]
 
 // ─── Thresholds ───────────────────────────────────────────────────────────────
