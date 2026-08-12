@@ -26,21 +26,15 @@ export interface DayNavigatorProps {
   onCalendar: () => void
 }
 
-export interface DayRowProps {
-  day: TDayEntry
-  isToday: boolean
-  maxCount: number
-  onPress: (day: TDayEntry) => void
-}
-
 export interface LogRowProps {
+  id: string
   index: number
-  timestamp: number
   time: string
+  tag?: TagId
   gapMs: number | null
   avgGapMs: number | null
-  onEdit: (ts: number) => void
-  onDelete: (ts: number) => void
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
 }
 
 export interface MonthCalendarProps {
@@ -81,12 +75,15 @@ export interface TimePickerSheetProps {
   visible: boolean
   value: Date
   onChange: (date: Date) => void
+  tag?: TagId
+  onTagChange: (tag: TagId | undefined) => void
+  tagsEnabled?: boolean
   onSave: () => void
   onClose: () => void
 }
 
 export interface UseSmokeLoggerProps {
-  onSmoked: (updatedTimes: number[]) => void
+  onSmoked: (updatedEntries: TLogEntry[]) => void
   onScheduled?: () => void
 }
 
@@ -99,6 +96,34 @@ export interface WeekBarChartProps {
   onNextWeek: () => void
   canGoNext: boolean
   onDayPress: (dateStr: string) => void
+}
+
+export interface TagPickerProps {
+  value?: TagId
+  onChange: (tag: TagId | undefined) => void
+}
+
+export interface QuickTagSheetProps {
+  visible: boolean
+  showSkipNudge: boolean
+  onSelect: (tag: TagId) => void
+  onSkip: () => void
+  onDisablePrompt: () => void
+  onClose: () => void
+}
+
+export interface TagBadgeProps {
+  tag: TagId
+  color?: string
+}
+
+export interface TagBreakdownProps {
+  data: TTagCount[]
+}
+
+export interface ToggleProps {
+  value: boolean
+  onChange: (value: boolean) => void
 }
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
@@ -122,10 +147,34 @@ export type TDayBar = {
   dateStr: string
 }
 
+export type TagId =
+  | 'COFFEE'
+  | 'AFTER_MEAL'
+  | 'DRINKING'
+  | 'SOCIAL'
+  | 'WORK_BREAK'
+  | 'STRESSED'
+  | 'BORED'
+  | 'LATE_NIGHT'
+  | 'RELAXING'
+
+export type TLogEntry = {
+  id: string
+  ts: number
+  tag?: TagId
+}
+
 export type TDayEntry = {
+  date: Date
   label: string
   fullDate: string
-  times: number[]
+  entries: TLogEntry[]
+}
+
+export type TTagCount = {
+  tag: TagId
+  count: number
+  pct: number
 }
 
 export type TStatCell = {

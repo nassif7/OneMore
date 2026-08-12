@@ -1,16 +1,10 @@
 import { getDay } from '@/services/storage'
+import { TDayEntry, TLogEntry } from '@/types'
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { AppState } from 'react-native'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-export type TDayEntry = {
-  date: Date
-  label: string
-  fullDate: string
-  times: number[]
-}
 
 interface UseHistoryDataState {
   entry: TDayEntry | null
@@ -60,19 +54,19 @@ const fromCalendarString = (date: Date): Date => {
 }
 
 /**
- * Creates a TDayEntry from a date and list of log times.
+ * Creates a TDayEntry from a date and list of log entries.
  * Generates localized labels for display in UI.
  *
  * @param date - Date to create entry for
- * @param times - Unix timestamps (milliseconds) of cigarettes logged
- * @returns Formatted day entry with labels and times
+ * @param entries - Log entries for that date
+ * @returns Formatted day entry with labels and entries
  *
  * @example
- * const times = [1705326600000, 1705330200000]
- * toEntry(new Date('2024-01-15'), times)
- * // → { date, label: "MONDAY", fullDate: "Jan 15, 2024", times: [...] }
+ * const entries = [{ id: '1705326600000', ts: 1705326600000 }]
+ * toEntry(new Date('2024-01-15'), entries)
+ * // → { date, label: "MONDAY", fullDate: "Jan 15, 2024", entries: [...] }
  */
-const toEntry = (date: Date, times: number[]): TDayEntry => ({
+const toEntry = (date: Date, entries: TLogEntry[]): TDayEntry => ({
   date,
   label: date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
   fullDate: date
@@ -82,7 +76,7 @@ const toEntry = (date: Date, times: number[]): TDayEntry => ({
       year: 'numeric',
     })
     .toUpperCase(),
-  times,
+  entries,
 })
 
 /**
@@ -118,7 +112,7 @@ const isToday = (date: Date): boolean => {
  *
  * @example
  * const { entry, selectedDate, isToday, goToPrevDay, goToNextDay, goToDate } = useHistoryData()
- * if (entry) console.log(`${entry.label}: ${entry.times.length} cigarettes`)
+ * if (entry) console.log(`${entry.label}: ${entry.entries.length} cigarettes`)
  */
 export default function useHistoryData(initialDate?: Date) {
   const [selectedDate, setSelectedDate] = useState<Date>(initialDate ? startOfDay(initialDate) : startOfDay(new Date()))
@@ -132,10 +126,10 @@ export default function useHistoryData(initialDate?: Date) {
   const loadData = useCallback(async () => {
     setState((s) => ({ ...s, isLoading: true, error: null }))
     try {
-      const times = await getDay(selectedDate)
+      const entries = await getDay(selectedDate)
       setState((s) => ({
         ...s,
-        entry: toEntry(selectedDate, times),
+        entry: toEntry(selectedDate, entries),
         isLoading: false,
         error: null,
       }))

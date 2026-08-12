@@ -1,4 +1,5 @@
 import { DAY_PREFIX } from '@/constants'
+import { parseEntries } from '@/helpers'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -25,17 +26,6 @@ export class PatternCalculatorError extends Error {
 const toMinutesSinceMidnight = (ts: number): number => {
   const d = new Date(ts)
   return d.getHours() * 60 + d.getMinutes()
-}
-
-const safeJsonParse = (json: string | null): number[] => {
-  if (!json) return []
-  try {
-    const parsed = JSON.parse(json)
-    return Array.isArray(parsed) && parsed.every((x) => typeof x === 'number') ? parsed : []
-  } catch {
-    console.warn('[PatternCalculator] Failed to parse JSON, returning empty array')
-    return []
-  }
 }
 
 // ─── Pattern Computation ──────────────────────────────────────────────────────
@@ -66,7 +56,7 @@ export const computePattern = async (): Promise<SmokingPattern> => {
     const lastMins: number[] = []
 
     for (const [, raw] of entries) {
-      const times = safeJsonParse(raw)
+      const times = parseEntries(raw).map((e) => e.ts)
       if (times.length === 0) continue
 
       firstMins.push(toMinutesSinceMidnight(times[0]))

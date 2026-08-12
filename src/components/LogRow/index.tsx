@@ -1,3 +1,4 @@
+import TagBadge from '@/components/TagBadge'
 import { formatGap, getGapColor } from '@/helpers'
 import { LogRowProps } from '@/types'
 import { Pencil, Trash2 } from 'lucide-react-native'
@@ -6,7 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Log Row ──────────────────────────────────────────────────────────────────
 
-export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit, onDelete }: LogRowProps) {
+export default function LogRow({ id, index, time, tag, gapMs, avgGapMs, onEdit, onDelete }: LogRowProps) {
   const ratio = gapMs !== null && avgGapMs !== null && gapMs > 0 ? gapMs / avgGapMs : null
 
   const color = getGapColor(ratio)
@@ -21,23 +22,24 @@ export default function LogRow({ index, timestamp, time, gapMs, avgGapMs, onEdit
       {/* Index */}
       <Text style={[styles.index, { color: indexColor }]}>#{index}</Text>
 
-      {/* Time + gap */}
+      {/* Time + gap + tag */}
       <View style={styles.main}>
         <Text style={[styles.time, { color: textColor }]}>{time}</Text>
         {gapMs !== null && <Text style={[styles.gap, { color: subTextColor }]}>+{formatGap(gapMs)} since last</Text>}
+        {tag && <TagBadge tag={tag} color={subTextColor} />}
       </View>
 
       {/* Actions */}
       <View style={styles.actions}>
         <TouchableOpacity
-          onPress={() => onEdit(timestamp)}
+          onPress={() => onEdit(id)}
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Pencil size={20} color={textColor} strokeWidth={3} />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => onDelete(timestamp)}
+          onPress={() => onDelete(id)}
           style={styles.actionButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   },
   main: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
   time: {
     fontFamily: 'BebasNeue',

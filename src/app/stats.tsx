@@ -1,10 +1,12 @@
 import { BottomNav, ScreenHeader } from '@/components'
 import MonthCalendar from '@/components/MonthCalendar'
 import StatGrid from '@/components/StatGrid'
+import TagBreakdown from '@/components/TagBreakdown'
 import { TStatCell } from '@/types'
 import StatsComparison from '@/components/StatsComparison'
 import WeekBarChart from '@/components/WeekBarChart'
 import useStatsData from '@/hooks/useStatsData'
+import useTagsEnabled from '@/hooks/useTagsEnabled'
 import { router } from 'expo-router'
 import React, { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -16,6 +18,7 @@ let savedView: TView = 'WEEK'
 export default function StatsScreen() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [view, setView] = useState<TView>(savedView)
+  const { enabled: tagsEnabled } = useTagsEnabled()
 
   const handleViewChange = (v: TView) => {
     savedView = v
@@ -34,6 +37,7 @@ export default function StatsScreen() {
     allTimeAvgGapMinutes,
     currentMonthStats,
     prevMonthStats,
+    tagBreakdown,
   } = useStatsData(weekOffset)
 
   const statCells: TStatCell[] = useMemo(
@@ -106,6 +110,7 @@ export default function StatsScreen() {
             <MonthCalendar monthData={monthData} dailyAvg={currentMonthStats.dailyAvg} />
           )}
         </View>
+        {tagsEnabled && <TagBreakdown data={tagBreakdown} />}
       </ScrollView>
 
       <BottomNav />

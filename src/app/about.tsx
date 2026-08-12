@@ -1,4 +1,6 @@
-import { ConfirmModal, ScreenHeader } from '@/components'
+import { ConfirmModal, ScreenHeader, Toggle } from '@/components'
+import useQuickTagPromptEnabled from '@/hooks/useQuickTagPromptEnabled'
+import useTagsEnabled from '@/hooks/useTagsEnabled'
 import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
@@ -11,6 +13,8 @@ const PROJECTS_URL = 'https://nassif.pro/projects'
 
 export default function AboutScreen() {
   const [resetVisible, setResetVisible] = useState(false)
+  const { enabled: tagsEnabled, setEnabled: setTagsEnabled } = useTagsEnabled()
+  const { enabled: quickPromptEnabled, setEnabled: setQuickPromptEnabled } = useQuickTagPromptEnabled()
   const { bottom } = useSafeAreaInsets()
   const cursorOpacity = useRef(new Animated.Value(1)).current
 
@@ -46,6 +50,20 @@ export default function AboutScreen() {
           <Text style={styles.description}>
             A simple cigarette tracker. No ads, no accounts, no data leaving your phone. Built by one person, for people who want to be honest with themselves.
           </Text>
+        </View>
+
+        <View style={styles.settingsSection}>
+          <Text style={styles.settingsTitle}>SETTINGS</Text>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>MOOD TAGS</Text>
+            <Toggle value={tagsEnabled} onChange={setTagsEnabled} />
+          </View>
+          {tagsEnabled && (
+            <View style={[styles.settingRow, styles.settingRowNested]}>
+              <Text style={styles.settingSubLabel}>ASK AFTER LOGGING</Text>
+              <Toggle value={quickPromptEnabled} onChange={setQuickPromptEnabled} />
+            </View>
+          )}
         </View>
 
         <TouchableOpacity style={styles.kofiButton} onPress={() => Linking.openURL(PROJECTS_URL)}>
@@ -128,6 +146,44 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 20,
     letterSpacing: 0.5,
+  },
+  settingsSection: {
+    borderWidth: 3,
+    borderColor: '#000',
+    backgroundColor: '#fff',
+  },
+  settingsTitle: {
+    fontFamily: 'SpaceMono',
+    fontSize: 10,
+    letterSpacing: 3,
+    color: '#666',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 4,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  settingRowNested: {
+    borderTopWidth: 2,
+    borderColor: '#000',
+    paddingLeft: 28,
+  },
+  settingLabel: {
+    fontFamily: 'BebasNeue',
+    fontSize: 20,
+    letterSpacing: 1,
+    color: '#000',
+  },
+  settingSubLabel: {
+    fontFamily: 'SpaceMono',
+    fontSize: 12,
+    letterSpacing: 1,
+    color: '#333',
   },
   kofiButton: {
     flexDirection: 'row',

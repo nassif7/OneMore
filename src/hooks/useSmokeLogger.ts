@@ -2,7 +2,7 @@ import { NUDGES } from '@/constants'
 import { scheduleFirstCigNotification, scheduleNextNotification } from '@/services/notificationScheduler'
 import { computePattern, PatternCalculatorError } from '@/services/patternCalculator'
 import { logCigarette } from '@/services/storage'
-import { UseSmokeLoggerProps } from '@/types'
+import { TLogEntry, UseSmokeLoggerProps } from '@/types'
 import * as Haptics from 'expo-haptics'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
@@ -15,7 +15,7 @@ export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLogger
   const handleSmoke = useCallback(async (): Promise<void> => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
 
-    let updated: number[]
+    let updated: TLogEntry[]
     try {
       updated = await logCigarette()
     } catch (error) {
@@ -24,7 +24,7 @@ export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLogger
       return
     }
 
-    const lastCigTime = updated[updated.length - 1]
+    const lastCigTime = updated[updated.length - 1].ts
 
     try {
       const pattern = await computePattern()

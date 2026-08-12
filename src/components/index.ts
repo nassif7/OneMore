@@ -1,7 +1,6 @@
 export { default as BottomNav } from "./BottomNav";
 export { default as ConfirmModal } from "./ConfirmModal";
 export { default as CounterBlock } from "./CounterBlock";
-export { default as DayRow } from "./DayRow";
 export { default as NudgeTicker } from "./NudgeTicker";
 export { default as ScreenHeader } from "./ScreenHeader";
 export { default as SmokeButton } from "./SmokeButton";
@@ -11,3 +10,8 @@ export { default as CalendarSheet } from "./CalendarSheet";
 export { default as TimePickerSheet } from "./TimePickerSheet";
 export { default as NudgeBox } from "./NudgeBox";
 export { default as StatsComparison } from "./StatsComparison";
+export { default as TagPicker } from "./TagPicker";
+export { default as QuickTagSheet } from "./QuickTagSheet";
+export { default as TagBadge } from "./TagBadge";
+export { default as TagBreakdown } from "./TagBreakdown";
+export { default as Toggle } from "./Toggle";

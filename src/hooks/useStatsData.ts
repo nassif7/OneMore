@@ -1,5 +1,7 @@
+import { TAGS } from '@/constants/tags'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
 import { getAllDays, getDay, getWeek } from '@/services/storage'
+import { TagId, TLogEntry, TTagCount } from '@/types'
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useReducer } from 'react'
 import { AppState } from 'react-native'
@@ -30,7 +32,7 @@ export type TStats = {
 
 interface StatsState {
   // today
-  todayTimes: number[]
+  todayEntries: TLogEntry[]
   // week
   weekData: TDayBar[]
   weekTotal: number
@@ -45,6 +47,7 @@ interface StatsState {
   allTimeDailyAvg: number
   allTimeAvgGap: string
   allTimeAvgGapMinutes: number | null
+  tagBreakdown: TTagCount[]
   // loading
   isLoading: boolean
   error: Error | null
@@ -89,12 +92,12 @@ function formatDateKey(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function getAvgGapMinutes(allTimes: number[][]): number | null {
+function getAvgGapMinutes(allEntries: TLogEntry[][]): number | null {
   const gaps: number[] = []
-  for (const times of allTimes) {
-    const sorted = [...times].sort()
+  for (const entries of allEntries) {
+    const sorted = [...entries].sort((a, b) => a.ts - b.ts)
     for (let i = 1; i < sorted.length; i++) {
-      gaps.push((sorted[i] - sorted[i - 1]) / 60000)
+      gaps.push((sorted[i].ts - sorted[i - 1].ts) / 60000)
     }
   }
   if (!gaps.length) return null
@@ -109,7 +112,7 @@ function formatGap(minutes: number | null): string {
   return m > 0 ? `${h}H ${m}M` : `${h}H`
 }
 
-function computePeriodStats(data: Record<string, number[]>): TPeriodStats {
+function computePeriodStats(data: Record<string, TLogEntry[]>): TPeriodStats {
   const counts = Object.values(data).map((t) => t.length)
   const daysWithData = counts.filter((c) => c > 0)
   const dailyAvg = daysWithData.length ? Math.round(daysWithData.reduce((a, b) => a + b, 0) / daysWithData.length) : 0
@@ -117,8 +120,23 @@ function computePeriodStats(data: Record<string, number[]>): TPeriodStats {
   return { dailyAvg, avgGapMinutes, avgGapLabel: formatGap(avgGapMinutes) }
 }
 
+function getTagBreakdown(data: Record<string, TLogEntry[]>): TTagCount[] {
+  const counts = new Map<TagId, number>()
+  let total = 0
+  for (const entries of Object.values(data)) {
+    for (const e of entries) {
+      total += 1
+      if (e.tag) counts.set(e.tag, (counts.get(e.tag) ?? 0) + 1)
+    }
+  }
+  return TAGS.map(({ id }) => {
+    const count = counts.get(id) ?? 0
+    return { tag: id, count, pct: total > 0 ? Math.round((count / total) * 100) : 0 }
+  }).sort((a, b) => b.count - a.count)
+}
+
 const initialState: StatsState = {
-  todayTimes: [],
+  todayEntries: [],
   weekData: [],
   weekTotal: 0,
   weekLabel: '',
@@ -130,6 +148,7 @@ const initialState: StatsState = {
   allTimeDailyAvg: 0,
   allTimeAvgGap: '—',
   allTimeAvgGapMinutes: null,
+  tagBreakdown: [],
   isLoading: true,
   error: null,
 }
@@ -212,17 +231,18 @@ export default function useStatsData(weekOffset: number = 0) {
       // ── All-time ──
       const allData = await getAllDays()
       const allTimeStats = computePeriodStats(allData)
+      const tagBreakdown = getTagBreakdown(allData)
 
       // ── Month calendar data ──
       const monthRecord: Record<string, number> = {}
-      for (const [key, times] of Object.entries(allData)) {
-        monthRecord[key] = times.length
+      for (const [key, entries] of Object.entries(allData)) {
+        monthRecord[key] = entries.length
       }
 
       dispatch({
         type: 'LOAD_SUCCESS',
         payload: {
-          todayTimes: todayData,
+          todayEntries: todayData,
           weekData: bars,
           weekTotal,
           weekLabel,
@@ -234,6 +254,7 @@ export default function useStatsData(weekOffset: number = 0) {
           allTimeDailyAvg: allTimeStats.dailyAvg,
           allTimeAvgGap: allTimeStats.avgGapLabel,
           allTimeAvgGapMinutes: allTimeStats.avgGapMinutes,
+          tagBreakdown,
         },
       })
     } catch (error) {
@@ -256,14 +277,14 @@ export default function useStatsData(weekOffset: number = 0) {
   )
 
   // ── Derived ──
-  const todayAvgGapMinutes = getAvgGapMinutes([state.todayTimes])
+  const todayAvgGapMinutes = getAvgGapMinutes([state.todayEntries])
   const stats: TStats = {
-    todayCount: state.todayTimes.length,
+    todayCount: state.todayEntries.length,
     weekTotal: state.weekTotal,
     dailyAvg: state.currentWeekStats.dailyAvg,
     packEquiv: (state.weekTotal / 20).toFixed(1),
-    avgGap: getAvgGap(state.todayTimes),
-    lastOne: getTimeSinceLast(state.todayTimes),
+    avgGap: getAvgGap(state.todayEntries),
+    lastOne: getTimeSinceLast(state.todayEntries),
   }
 
   return {
@@ -283,6 +304,7 @@ export default function useStatsData(weekOffset: number = 0) {
     allTimeDailyAvg: state.allTimeDailyAvg,
     allTimeAvgGap: state.allTimeAvgGap,
     allTimeAvgGapMinutes: state.allTimeAvgGapMinutes,
+    tagBreakdown: state.tagBreakdown,
     // state
     isLoading: state.isLoading,
     error: state.error,

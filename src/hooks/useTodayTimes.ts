@@ -1,16 +1,17 @@
 import { getDay } from '@/services/storage'
+import { TLogEntry } from '@/types'
 import { useCallback, useEffect, useState } from 'react'
 import { AppState } from 'react-native'
 
 interface UseTodayTimesState {
-  times: number[]
+  entries: TLogEntry[]
   isLoading: boolean
   error: Error | null
 }
 
 export default function useTodayTimes() {
   const [state, setState] = useState<UseTodayTimesState>({
-    times: [],
+    entries: [],
     isLoading: true,
     error: null,
   })
@@ -18,13 +19,13 @@ export default function useTodayTimes() {
   const loadToday = useCallback(async () => {
     setState((s) => ({ ...s, isLoading: true, error: null }))
     try {
-      const todayTimes = await getDay(new Date())
-      setState((s) => ({ ...s, times: todayTimes, isLoading: false, error: null }))
+      const todayEntries = await getDay(new Date())
+      setState((s) => ({ ...s, entries: todayEntries, isLoading: false, error: null }))
     } catch (error) {
       console.error('[useTodayTimes] Error loading today times:', error)
       setState((s) => ({
         ...s,
-        times: [],
+        entries: [],
         isLoading: false,
         error: error instanceof Error ? error : new Error('Unknown error loading today times'),
       }))
@@ -41,13 +42,13 @@ export default function useTodayTimes() {
     return () => sub.remove()
   }, [loadToday])
 
-  const setTimes = useCallback((times: number[]) => {
-    setState((s) => ({ ...s, times }))
+  const setEntries = useCallback((entries: TLogEntry[]) => {
+    setState((s) => ({ ...s, entries }))
   }, [])
 
   return {
-    times: state.times,
-    setTimes,
+    entries: state.entries,
+    setEntries,
     reload: loadToday,
     isLoading: state.isLoading,
     error: state.error,

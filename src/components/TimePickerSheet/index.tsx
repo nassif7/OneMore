@@ -1,3 +1,4 @@
+import TagPicker from '@/components/TagPicker'
 import { TimePickerSheetProps } from '@/types'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import React from 'react'
@@ -5,7 +6,16 @@ import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 
 // ─── Time Picker Sheet ────────────────────────────────────────────────────────
 
-export default function TimePickerSheet({ visible, value, onChange, onSave, onClose }: TimePickerSheetProps) {
+export default function TimePickerSheet({
+  visible,
+  value,
+  onChange,
+  tag,
+  onTagChange,
+  tagsEnabled = true,
+  onSave,
+  onClose,
+}: TimePickerSheetProps) {
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
@@ -13,7 +23,7 @@ export default function TimePickerSheet({ visible, value, onChange, onSave, onCl
         <View style={styles.handle} />
 
         <View style={styles.header}>
-          <Text style={styles.title}>EDIT TIME</Text>
+          <Text style={styles.title}>EDIT ENTRY</Text>
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>SAVE</Text>
           </TouchableOpacity>
@@ -27,6 +37,13 @@ export default function TimePickerSheet({ visible, value, onChange, onSave, onCl
           style={styles.picker}
           textColor="#000"
         />
+
+        {tagsEnabled && (
+          <>
+            <Text style={styles.sectionLabel}>TAG</Text>
+            <TagPicker value={tag} onChange={onTagChange} />
+          </>
+        )}
       </View>
     </Modal>
   )
@@ -90,5 +107,13 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%',
+  },
+  sectionLabel: {
+    fontFamily: 'SpaceMono',
+    fontSize: 10,
+    letterSpacing: 3,
+    color: '#666',
+    marginTop: 8,
+    marginBottom: 12,
   },
 })

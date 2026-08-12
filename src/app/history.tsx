@@ -6,9 +6,11 @@ import LogRow from '@/components/LogRow'
 import TimePickerSheet from '@/components/TimePickerSheet'
 import { toCalendarDateString } from '@/helpers'
 import useHistoryData from '@/hooks/useHistoryData'
+import useTagsEnabled from '@/hooks/useTagsEnabled'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
-import { addLog, deleteLog, editLog } from '@/services/storage'
+import { addLog, deleteLog, editLog, setTag } from '@/services/storage'
+import { TagId, TLogEntry } from '@/types'
 import { router } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -19,16 +21,19 @@ export default function HistoryScreen() {
   const initialDate = date ? new Date(date) : undefined
 
   const { entry, selectedDate, isToday, goToPrevDay, goToNextDay, goToDate, reload } = useHistoryData(initialDate)
+  const { enabled: tagsEnabled } = useTagsEnabled()
 
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
-  const [editingTs, setEditingTs] = useState<number | null>(null)
+  const [editingEntry, setEditingEntry] = useState<TLogEntry | null>(null)
   const [editTime, setEditTime] = useState<Date>(new Date())
-  const [deletingTs, setDeletingTs] = useState<number | null>(null)
+  const [editTag, setEditTag] = useState<TagId | undefined>(undefined)
+  const [deletingEntry, setDeletingEntry] = useState<TLogEntry | null>(null)
   const [isAdding, setIsAdding] = useState<boolean>(false)
   const [addTime, setAddTime] = useState<Date>(new Date())
+  const [addTag, setAddTag] = useState<TagId | undefined>(undefined)
 
-  const times = useMemo(() => (entry?.times ? [...entry.times].reverse() : []), [entry?.times])
+  const entries = useMemo(() => (entry?.entries ? [...entry.entries].reverse() : []), [entry?.entries])
   const dateStr = toCalendarDateString(selectedDate)
 
   useEffect(() => {
@@ -39,12 +44,13 @@ export default function HistoryScreen() {
 
   const handleAddOpen = () => {
     setAddTime(new Date(selectedDate))
+    setAddTag(undefined)
     setIsAdding(true)
   }
 
   const handleAddSave = async () => {
     try {
-      await addLog(selectedDate, addTime.getTime())
+      await addLog(selectedDate, addTime.getTime(), addTag)
       setIsAdding(false)
       reload()
     } catch (error) {
@@ -54,36 +60,40 @@ export default function HistoryScreen() {
     }
   }
 
-  const handleDelete = (ts: number) => setDeletingTs(ts)
+  const handleDelete = (id: string) => setDeletingEntry(entries.find((e) => e.id === id) ?? null)
 
   const handleDeleteConfirm = async () => {
-    if (deletingTs === null) return
+    if (!deletingEntry) return
     try {
-      await deleteLog(selectedDate, deletingTs)
-      setDeletingTs(null)
+      await deleteLog(selectedDate, deletingEntry.id)
+      setDeletingEntry(null)
       reload()
     } catch (error) {
       console.error('[HistoryScreen] Failed to delete log:', error)
       Alert.alert('ERROR', 'Failed to delete. Please try again.')
-      setDeletingTs(null)
+      setDeletingEntry(null)
     }
   }
 
-  const handleEditOpen = (ts: number) => {
-    setEditingTs(ts)
-    setEditTime(new Date(ts))
+  const handleEditOpen = (id: string) => {
+    const found = entries.find((e) => e.id === id)
+    if (!found) return
+    setEditingEntry(found)
+    setEditTime(new Date(found.ts))
+    setEditTag(found.tag)
   }
 
   const handleEditSave = async () => {
-    if (editingTs === null) return
+    if (!editingEntry) return
     try {
-      await editLog(selectedDate, editingTs, editTime.getTime())
-      setEditingTs(null)
+      await editLog(selectedDate, editingEntry.id, editTime.getTime())
+      if (editTag !== editingEntry.tag) await setTag(selectedDate, editingEntry.id, editTag)
+      setEditingEntry(null)
       reload()
     } catch (error) {
       console.error('[HistoryScreen] Failed to edit log:', error)
       Alert.alert('ERROR', 'Failed to save. Please try again.')
-      setEditingTs(null)
+      setEditingEntry(null)
     }
   }
 
@@ -103,21 +113,22 @@ export default function HistoryScreen() {
         <Text style={styles.addRowLabel}>ADD CIG</Text>
       </TouchableOpacity>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {times.length === 0 && (
+        {entries.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>CLEAN DAY.</Text>
             <Text style={styles.emptySubtitle}>nothing logged.</Text>
           </View>
         )}
-        {times.map((ts, i) => {
-          const prevTs = times[i + 1] ?? null
-          const gapMs = prevTs !== null ? ts - prevTs : null
+        {entries.map((e, i) => {
+          const prevEntry = entries[i + 1] ?? null
+          const gapMs = prevEntry ? e.ts - prevEntry.ts : null
           return (
             <LogRow
-              key={ts}
-              index={times.length - i}
-              timestamp={ts}
-              time={formatTime(ts)}
+              key={e.id}
+              id={e.id}
+              index={entries.length - i}
+              time={formatTime(e.ts)}
+              tag={tagsEnabled ? e.tag : undefined}
               gapMs={gapMs}
               avgGapMs={avgGapMs}
               onEdit={handleEditOpen}
@@ -128,16 +139,22 @@ export default function HistoryScreen() {
         <View style={{ height: 20 }} />
       </ScrollView>
       <TimePickerSheet
-        visible={editingTs !== null}
+        visible={editingEntry !== null}
         value={editTime}
         onChange={setEditTime}
+        tag={editTag}
+        onTagChange={setEditTag}
+        tagsEnabled={tagsEnabled}
         onSave={handleEditSave}
-        onClose={() => setEditingTs(null)}
+        onClose={() => setEditingEntry(null)}
       />
       <TimePickerSheet
         visible={isAdding}
         value={addTime}
         onChange={setAddTime}
+        tag={addTag}
+        onTagChange={setAddTag}
+        tagsEnabled={tagsEnabled}
         onSave={handleAddSave}
         onClose={() => setIsAdding(false)}
       />
@@ -151,12 +168,12 @@ export default function HistoryScreen() {
         onClose={() => setCalendarVisible(false)}
       />
       <ConfirmModal
-        visible={deletingTs !== null}
+        visible={deletingEntry !== null}
         title="DELETE CIG?"
-        body={`Remove the ${deletingTs ? formatTime(deletingTs) : ''} cig?`}
+        body={`Remove the ${deletingEntry ? formatTime(deletingEntry.ts) : ''} cig?`}
         confirmLabel="DELETE"
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingTs(null)}
+        onCancel={() => setDeletingEntry(null)}
       />
       <BottomNav />
     </View>

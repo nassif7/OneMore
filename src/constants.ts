@@ -5,6 +5,9 @@ export const NEXT_NOTIF_TIME_KEY = 'next_notification_time'
 export const NEXT_NOTIF_BODY_KEY = 'next_notification_body'
 export const PENDING_NOTIF_KEY = 'pending_notification_id'
 export const FIRST_CIG_NOTIF_KEY = 'first_cig_notif_id'
+export const TAGS_ENABLED_KEY = 'tags_enabled'
+export const QUICK_TAG_PROMPT_ENABLED_KEY = 'quick_tag_prompt_enabled'
+export const TAG_SKIP_NUDGE_SHOWN_KEY = 'tag_skip_nudge_shown'
 
 // ─── Nudges ───────────────────────────────────────────────────────────────────
 
