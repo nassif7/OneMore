@@ -1,10 +1,15 @@
 import TagPicker from '@/components/TagPicker'
+import { formatTime } from '@/services/stats'
 import { TimePickerSheetProps } from '@/types'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import React from 'react'
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
+import React, { useEffect, useState } from 'react'
 import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Time Picker Sheet ────────────────────────────────────────────────────────
+// On iOS the picker renders inline (display="spinner"). On Android,
+// display="default" opens the system time dialog as a real OS-level popup —
+// it can't be embedded — so it's only mounted on demand, triggered by a
+// styled time button, and unmounts itself once a value is picked or dismissed.
 
 export default function TimePickerSheet({
   visible,
@@ -16,6 +21,17 @@ export default function TimePickerSheet({
   onSave,
   onClose,
 }: TimePickerSheetProps) {
+  const [showAndroidPicker, setShowAndroidPicker] = useState(false)
+
+  useEffect(() => {
+    if (visible) setShowAndroidPicker(false)
+  }, [visible])
+
+  const handleChange = (_event: DateTimePickerEvent, date?: Date) => {
+    if (Platform.OS === 'android') setShowAndroidPicker(false)
+    if (date) onChange(date)
+  }
+
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
@@ -29,14 +45,16 @@ export default function TimePickerSheet({
           </TouchableOpacity>
         </View>
 
-        <DateTimePicker
-          value={value}
-          mode="time"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(_, date) => date && onChange(date)}
-          style={styles.picker}
-          textColor="#000"
-        />
+        {Platform.OS === 'ios' ? (
+          <DateTimePicker value={value} mode="time" display="spinner" onChange={handleChange} style={styles.picker} textColor="#000" />
+        ) : (
+          <>
+            <TouchableOpacity style={styles.androidTimeButton} onPress={() => setShowAndroidPicker(true)}>
+              <Text style={styles.androidTimeButtonText}>{formatTime(value.getTime())}</Text>
+            </TouchableOpacity>
+            {showAndroidPicker && <DateTimePicker value={value} mode="time" display="default" onChange={handleChange} />}
+          </>
+        )}
 
         {tagsEnabled && (
           <>
@@ -107,6 +125,19 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%',
+  },
+  androidTimeButton: {
+    borderWidth: 3,
+    borderColor: '#000',
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  androidTimeButtonText: {
+    fontFamily: 'BebasNeue',
+    fontSize: 36,
+    letterSpacing: 3,
+    color: '#000',
   },
   sectionLabel: {
     fontFamily: 'SpaceMono',

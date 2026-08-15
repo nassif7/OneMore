@@ -1,6 +1,7 @@
 import { ConfirmModal, ScreenHeader, Toggle } from '@/components'
 import useQuickTagPromptEnabled from '@/hooks/useQuickTagPromptEnabled'
 import useTagsEnabled from '@/hooks/useTagsEnabled'
+import { clearDemoData, seedDemoData } from '@/services/devSeed'
 import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
@@ -17,6 +18,26 @@ export default function AboutScreen() {
   const { enabled: quickPromptEnabled, setEnabled: setQuickPromptEnabled } = useQuickTagPromptEnabled()
   const { bottom } = useSafeAreaInsets()
   const cursorOpacity = useRef(new Animated.Value(1)).current
+
+  const handleSeedDemo = async () => {
+    try {
+      const seeded = await seedDemoData()
+      Alert.alert('DEMO DATA', seeded > 0 ? `Filled in ${seeded} empty day(s).` : 'No empty days in range — nothing added.')
+    } catch (error) {
+      console.error('[AboutScreen] Failed to seed demo data:', error)
+      Alert.alert('ERROR', 'Failed to seed demo data.')
+    }
+  }
+
+  const handleClearDemo = async () => {
+    try {
+      await clearDemoData()
+      Alert.alert('DEMO DATA', 'Removed.')
+    } catch (error) {
+      console.error('[AboutScreen] Failed to clear demo data:', error)
+      Alert.alert('ERROR', 'Failed to clear demo data.')
+    }
+  }
 
   useEffect(() => {
     Animated.loop(
@@ -75,6 +96,20 @@ export default function AboutScreen() {
           <RotateCcw size={18} color="#fff" strokeWidth={3} />
           <Text style={styles.resetText}>RESET ALL DATA</Text>
         </TouchableOpacity>
+
+        {__DEV__ && (
+          <View style={styles.devSection}>
+            <Text style={styles.devTitle}>DEV — SCREENSHOT DATA (LOCAL ONLY)</Text>
+            <View style={styles.devButtons}>
+              <TouchableOpacity style={styles.devButton} onPress={handleSeedDemo}>
+                <Text style={styles.devButtonText}>SEED DEMO DATA</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.devButton} onPress={handleClearDemo}>
+                <Text style={styles.devButtonText}>CLEAR DEMO DATA</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         <View style={{ flex: 1 }} />
 
@@ -235,6 +270,36 @@ const styles = StyleSheet.create({
     fontSize: 20,
     letterSpacing: 2,
     color: '#fff',
+  },
+  devSection: {
+    borderWidth: 2,
+    borderColor: '#999',
+    borderStyle: 'dashed',
+    padding: 12,
+    gap: 8,
+  },
+  devTitle: {
+    fontFamily: 'SpaceMono',
+    fontSize: 8,
+    letterSpacing: 1,
+    color: '#999',
+  },
+  devButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  devButton: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#999',
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  devButtonText: {
+    fontFamily: 'BebasNeue',
+    fontSize: 13,
+    letterSpacing: 1,
+    color: '#666',
   },
   footer: {
     flexDirection: 'row',
