@@ -50,3 +50,5 @@ app-example
 !tsconfig.json
 !app.json
 !eas.json
+!release-please-config.json
+!.release-please-manifest.json

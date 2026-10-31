@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "00a65ba17af9897fbb9a5b7039e01cb1ab0088c6",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "onemore",
+      "include-component-in-tag": false,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "app.json",
+          "jsonpath": "$.expo.version"
+        }
+      ]
+    }
+  }
+}
