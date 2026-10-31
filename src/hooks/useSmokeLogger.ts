@@ -2,6 +2,7 @@ import { NUDGES } from '@/constants'
 import { scheduleFirstCigNotification, scheduleNextNotification } from '@/services/notificationScheduler'
 import { computePattern, PatternCalculatorError } from '@/services/patternCalculator'
 import { logCigarette } from '@/services/storage'
+import { syncWidget } from '@/services/widget'
 import { TLogEntry, UseSmokeLoggerProps } from '@/types'
 import * as Haptics from 'expo-haptics'
 import { useCallback, useState } from 'react'
@@ -24,6 +25,7 @@ export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLogger
       return
     }
 
+    syncWidget()
     const lastCigTime = updated[updated.length - 1].ts
 
     try {

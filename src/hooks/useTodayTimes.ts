@@ -1,4 +1,5 @@
 import { getDay } from '@/services/storage'
+import { onWidgetMerged } from '@/services/widget'
 import { TLogEntry } from '@/types'
 import { useCallback, useEffect, useState } from 'react'
 import { AppState } from 'react-native'
@@ -39,7 +40,12 @@ export default function useTodayTimes() {
       if (appState === 'active') loadToday()
     })
 
-    return () => sub.remove()
+    const unsubscribeWidget = onWidgetMerged(loadToday)
+
+    return () => {
+      sub.remove()
+      unsubscribeWidget()
+    }
   }, [loadToday])
 
   const setEntries = useCallback((entries: TLogEntry[]) => {
