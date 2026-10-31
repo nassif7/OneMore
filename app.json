@@ -52,7 +52,10 @@
               "name": "OneMoreWidget",
               "displayName": "OneMore",
               "description": "Today's count and time since your last one.",
-              "ios": { "supportedFamilies": ["systemSmall", "accessoryCircular", "accessoryRectangular"] }
+              "ios": {
+                "supportedFamilies": ["systemSmall", "accessoryCircular", "accessoryRectangular"],
+                "contentMarginsDisabled": true
+              }
             }
           ]
         }

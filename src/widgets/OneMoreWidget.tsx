@@ -1,16 +1,16 @@
-import { Button, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, Circle, HStack, Spacer, Text, VStack, ZStack } from '@expo/ui/swift-ui'
 import {
-  background,
-  border,
+  buttonStyle,
   containerBackground,
   font,
   foregroundStyle,
   frame,
   kerning,
+  layoutPriority,
   lineLimit,
   minimumScaleFactor,
+  offset,
   padding,
-  textCase,
   widgetURL,
 } from '@expo/ui/swift-ui/modifiers'
 import { createWidget, type WidgetEnvironment } from 'expo-widgets'
@@ -19,31 +19,37 @@ import type { WidgetProps } from '@/helpers/widgetSync'
 
 // The widget body runs in an isolated JavaScriptCore context: no imports or module-scope values
 // are available at render time, so every colour and size below is declared inside the component.
+//
+// Fonts: Bebas Neue can't be bundled into the extension and @expo/ui has no SwiftUI fontWidth, but
+// font({ family }) accepts any installed font, so numbers use DIN Condensed Bold (ships with iOS).
 const OneMoreWidget = (props: WidgetProps, environment: WidgetEnvironment) => {
   'widget'
 
-  const CREAM = '#F5F0E8'
-  const BLACK = '#000000'
-  const RED = '#C0392B'
   const family = environment.widgetFamily
+  const dark = environment.colorScheme === 'dark'
+  const RED = '#C0392B'
+  const DISPLAY = 'DINCondensed-Bold'
+  const BG = dark ? '#0E0E0E' : '#F5F0E8'
+  const INK = dark ? '#F5F0E8' : '#000000'
   const lastDate = props.lastLoggedAt !== null ? new Date(props.lastLoggedAt) : null
 
   // Lock screen: the system tints these, so no custom colours or backgrounds.
   if (family === 'accessoryCircular') {
     return (
-      <VStack modifiers={[frame({ maxWidth: 1000, maxHeight: 1000 }), widgetURL('onemore://')]}>
-        <Text modifiers={[font({ size: 34, weight: 'black' }), minimumScaleFactor(0.5), lineLimit(1)]}>
+      <VStack spacing={0} modifiers={[padding({ all: 4 }), frame({ maxWidth: 1000, maxHeight: 1000 }), widgetURL('onemore://')]}>
+        <Text modifiers={[font({ family: DISPLAY, size: 34 }), minimumScaleFactor(0.5), lineLimit(1)]}>
           {String(props.todayCount)}
         </Text>
+        <Text modifiers={[font({ size: 8, weight: 'bold', design: 'monospaced' }), kerning(1.5)]}>TODAY</Text>
       </VStack>
     )
   }
 
   if (family === 'accessoryRectangular') {
     return (
-      <VStack alignment="leading" spacing={1} modifiers={[frame({ maxWidth: 1000, alignment: 'leading' }), widgetURL('onemore://')]}>
+      <VStack alignment="leading" spacing={1} modifiers={[padding({ all: 6 }), frame({ maxWidth: 1000, alignment: 'leading' }), widgetURL('onemore://')]}>
         <HStack spacing={6}>
-          <Text modifiers={[font({ size: 26, weight: 'black' }), lineLimit(1)]}>{String(props.todayCount)}</Text>
+          <Text modifiers={[font({ family: DISPLAY, size: 30 }), lineLimit(1)]}>{String(props.todayCount)}</Text>
           <Text modifiers={[font({ size: 10, weight: 'bold', design: 'monospaced' }), kerning(1.5)]}>TODAY</Text>
         </HStack>
         <HStack spacing={4}>
@@ -52,7 +58,7 @@ const OneMoreWidget = (props: WidgetProps, environment: WidgetEnvironment) => {
             <Text
               date={lastDate}
               dateStyle="relative"
-              modifiers={[font({ size: 11, weight: 'bold', design: 'monospaced' }), textCase('uppercase'), lineLimit(1), minimumScaleFactor(0.7)]}
+              modifiers={[font({ size: 11, weight: 'bold', design: 'monospaced' }), lineLimit(1), minimumScaleFactor(0.7)]}
             />
           ) : (
             <Text modifiers={[font({ size: 11, weight: 'bold', design: 'monospaced' })]}>NONE</Text>
@@ -62,58 +68,72 @@ const OneMoreWidget = (props: WidgetProps, environment: WidgetEnvironment) => {
     )
   }
 
-  // systemSmall (and any larger family, which falls back to the same layout)
+  const frameModifiers = [
+    frame({ maxWidth: 1000, maxHeight: 1000, alignment: 'topLeading' }),
+    containerBackground(BG, 'widget'),
+    widgetURL('onemore://'),
+  ]
+
+  // 01 SMALL – COUNT: iOS 16 has no widget buttons, so show the count and the LAST line only.
+  if (!props.interactive) {
+    return (
+      <VStack alignment="leading" spacing={0} modifiers={[padding({ horizontal: 14, vertical: 12 }), ...frameModifiers]}>
+        <Text modifiers={[font({ size: 9, weight: 'black', design: 'monospaced' }), kerning(2), foregroundStyle(INK)]}>TODAY</Text>
+        <Text
+          modifiers={[
+            font({ family: DISPLAY, size: 120 }),
+            minimumScaleFactor(0.4),
+            lineLimit(1),
+            layoutPriority(1),
+            foregroundStyle(INK),
+          ]}>
+          {String(props.todayCount)}
+        </Text>
+        <Spacer />
+        <HStack spacing={4}>
+          <Text modifiers={[font({ size: 9, weight: 'black', design: 'monospaced' }), kerning(1.5), foregroundStyle(RED)]}>LAST</Text>
+          {lastDate ? (
+            <Text
+              date={lastDate}
+              dateStyle="relative"
+              modifiers={[font({ size: 11, weight: 'bold', design: 'monospaced' }), lineLimit(1), minimumScaleFactor(0.6), foregroundStyle(INK)]}
+            />
+          ) : (
+            <Text modifiers={[font({ size: 11, weight: 'bold', design: 'monospaced' }), foregroundStyle(INK)]}>NONE</Text>
+          )}
+        </HStack>
+      </VStack>
+    )
+  }
+
+  // 02 SMALL – ONE TAP (light) and 07 SMALL – DARK: label left, count right, red circle button below.
+  const CIRCLE = 88
   return (
-    <VStack
-      alignment="leading"
-      spacing={2}
-      modifiers={[
-        padding({ all: 12 }),
-        frame({ maxWidth: 1000, maxHeight: 1000, alignment: 'topLeading' }),
-        border({ content: BLACK, width: 4 }),
-        containerBackground(CREAM, 'widget'),
-        widgetURL('onemore://'),
-      ]}>
-      <Text modifiers={[font({ size: 10, weight: 'black', design: 'monospaced' }), kerning(2), foregroundStyle(RED)]}>TODAY</Text>
-      <Text modifiers={[font({ size: 76, weight: 'black' }), minimumScaleFactor(0.5), lineLimit(1), foregroundStyle(BLACK)]}>
-        {String(props.todayCount)}
-      </Text>
-      <HStack spacing={4}>
-        <Text modifiers={[font({ size: 9, weight: 'black', design: 'monospaced' }), kerning(1.5), foregroundStyle(RED)]}>LAST</Text>
-        {lastDate ? (
-          <Text
-            date={lastDate}
-            dateStyle="relative"
-            modifiers={[
-              font({ size: 10, weight: 'bold', design: 'monospaced' }),
-              textCase('uppercase'),
-              lineLimit(1),
-              minimumScaleFactor(0.6),
-              foregroundStyle(BLACK),
-            ]}
-          />
-        ) : (
-          <Text modifiers={[font({ size: 10, weight: 'bold', design: 'monospaced' }), foregroundStyle(BLACK)]}>NONE</Text>
-        )}
+    <VStack spacing={0} modifiers={[padding({ top: 12, bottom: 12, horizontal: 16 }), ...frameModifiers]}>
+      <HStack alignment="center">
+        <Text modifiers={[font({ size: 9, weight: 'bold', design: 'monospaced' }), kerning(1), foregroundStyle(INK)]}>TODAY</Text>
+        <Spacer />
+        <Text modifiers={[font({ family: DISPLAY, size: 32 }), lineLimit(1), foregroundStyle(INK)]}>{String(props.todayCount)}</Text>
       </HStack>
       <Spacer />
-      {props.interactive ? (
-        <Button
-          onPress={() => {
-            const now = Date.now()
-            return { todayCount: props.todayCount + 1, lastLoggedAt: now, pendingTs: [...props.pendingTs, now] }
-          }}>
-          <Text
-            modifiers={[
-              font({ size: 16, weight: 'black', design: 'monospaced' }),
-              foregroundStyle(CREAM),
-              frame({ maxWidth: 1000, height: 28 }),
-              background(BLACK),
-            ]}>
-            +1
-          </Text>
-        </Button>
-      ) : null}
+      <Button
+        modifiers={[buttonStyle('plain')]}
+        onPress={() => {
+          const now = Date.now()
+          return { todayCount: props.todayCount + 1, lastLoggedAt: now, pendingTs: [...props.pendingTs, now] }
+        }}>
+        <ZStack>
+          {/* Thin hard shadow, no blur: a same-size solid copy shifted 3pt down and right. */}
+          <Circle modifiers={[foregroundStyle(INK), frame({ width: CIRCLE, height: CIRCLE }), offset({ x: 3, y: 3 })]} />
+          <Circle modifiers={[foregroundStyle(INK), frame({ width: CIRCLE, height: CIRCLE })]} />
+          <Circle modifiers={[foregroundStyle(RED), frame({ width: CIRCLE - 6, height: CIRCLE - 6 })]} />
+          <VStack spacing={-2}>
+            <Text modifiers={[font({ family: DISPLAY, size: 24 }), foregroundStyle('#FFFFFF')]}>ONE</Text>
+            <Text modifiers={[font({ family: DISPLAY, size: 24 }), foregroundStyle('#FFFFFF')]}>MORE</Text>
+          </VStack>
+        </ZStack>
+      </Button>
+      <Spacer />
     </VStack>
   )
 }
