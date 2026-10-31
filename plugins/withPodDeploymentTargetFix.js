@@ -1,4 +1,4 @@
-const { withPodfile } = require('@expo/config-plugins')
+const { withPodfile } = require('expo/config-plugins')
 
 // Several pods' own resource-bundle subtargets (RNSVG, Sentry, SDWebImage, ...) ship a much
 // older IPHONEOS_DEPLOYMENT_TARGET than the app itself and don't inherit the main target's

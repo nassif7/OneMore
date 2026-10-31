@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "onemore",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "backgroundColor": "#B43A2D",
-      "resizeMode": "cover"
-    },
     "ios": {
       "bundleIdentifier": "pro.nassif.onemore",
       "icon": "./assets/images/icon.png",
@@ -34,13 +29,20 @@
     },
     "plugins": [
       "expo-router",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "backgroundColor": "#B43A2D",
+          "resizeMode": "cover"
+        }
+      ],
       "expo-font",
       "expo-web-browser",
       "@react-native-community/datetimepicker",
       "expo-image",
       "./plugins/withPodDeploymentTargetFix.js",
-      ["expo-build-properties", { "ios": { "deploymentTarget": "16.0" } }]
+      ["expo-build-properties", { "ios": { "deploymentTarget": "16.4" } }]
     ],
     "experiments": {
       "typedRoutes": true,
