@@ -1,7 +1,7 @@
 import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue'
 import { SpaceMono_700Bold } from '@expo-google-fonts/space-mono'
 import { AnimatedSplashScreenProps } from '@/types'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import Animated, {
   Easing,
@@ -18,11 +18,10 @@ const RED = '#C0392B'
 const BLACK = '#000000'
 const CREAM = '#F5F0E8'
 
-const { width: SW, height: SH } = Dimensions.get('window')
+const { width: SW } = Dimensions.get('window')
 const PANEL_SIZE = Math.min(SW * 0.78, 340)
 const SHADOW_OFFSET = 12
 const BORDER = 8
-const CROSS_ARM = PANEL_SIZE * 0.42
 const CROSS_THICK = PANEL_SIZE * 0.13
 
 const TICKER_ITEMS = [
@@ -36,6 +35,8 @@ const TICKER_ITEMS = [
   '• TRACK IT',
   "• DON'T QUIT",
 ]
+// Ticker scroll width (approximate)
+const TICKER_FULL_W = TICKER_ITEMS.length * 120
 
 export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScreenProps) {
   const [fontsLoaded] = useFonts({ BebasNeue_400Regular, SpaceMono_700Bold })
@@ -64,8 +65,11 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
   const titleOpacity = useSharedValue(0)
   const titleTranslate = useSharedValue(18)
 
-  // ── Ticker scroll width (approximate) ─────────────────────────────────────
-  const TICKER_FULL_W = TICKER_ITEMS.length * 120
+  // Keep the latest callback without restarting the animation when it changes
+  const onFinishedRef = useRef(onFinished)
+  useEffect(() => {
+    onFinishedRef.current = onFinished
+  }, [onFinished])
 
   // ── Animation sequence ────────────────────────────────────────────────────
   useEffect(() => {
@@ -120,9 +124,26 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
     titleTranslate.value = withDelay(1200, withTiming(0, { duration: 420, easing: E.out(E.quad) }))
 
     // 2600ms — done, hand off
-    const timeout = setTimeout(() => onFinished(), 2600)
+    const timeout = setTimeout(() => onFinishedRef.current(), 2600)
     return () => clearTimeout(timeout)
-  }, [fontsLoaded])
+  }, [
+    fontsLoaded,
+    flashOpacity,
+    barHeight,
+    shadowOpacity,
+    shadowTranslate,
+    panelOpacity,
+    panelScale,
+    panelRotate,
+    crossHScale,
+    crossVScale,
+    stampOpacity,
+    stampTranslate,
+    tickerReveal,
+    tickerX,
+    titleOpacity,
+    titleTranslate,
+  ])
 
   // ── Animated styles ────────────────────────────────────────────────────────
   const flashStyle = useAnimatedStyle(() => ({
@@ -226,7 +247,7 @@ export default function AnimatedSplashScreen({ onFinished }: AnimatedSplashScree
         <Animated.View style={[styles.titleWrap, { top: PANEL_SIZE + 18 }]}>
           <Animated.View style={titleStyle}>
             <Text style={styles.titleText}>ONEMORE</Text>
-            <Text style={styles.tagline}>track it. don't quit.</Text>
+            <Text style={styles.tagline}>{"track it. don't quit."}</Text>
           </Animated.View>
         </Animated.View>
       </View>

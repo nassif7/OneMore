@@ -46,7 +46,7 @@ export default function AboutScreen() {
         Animated.timing(cursorOpacity, { toValue: 1, duration: 500, useNativeDriver: false }),
       ])
     ).start()
-  }, [])
+  }, [cursorOpacity])
 
   const handleResetConfirm = async () => {
     try {
