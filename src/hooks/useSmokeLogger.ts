@@ -25,7 +25,6 @@ export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLogger
       return
     }
 
-    syncWidget()
     const lastCigTime = updated[updated.length - 1].ts
 
     try {
@@ -38,6 +37,7 @@ export default function useSmokeLogger({ onSmoked, onScheduled }: UseSmokeLogger
       }
     }
 
+    syncWidget()
     setNudge(randomNudge())
     onSmoked(updated)
     onScheduled?.()

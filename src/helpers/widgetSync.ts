@@ -1,5 +1,5 @@
 import { TLogEntry } from '@/types'
-import { toCalendarDateString } from './time'
+import { formatTimeUntil, toCalendarDateString } from './time'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -10,6 +10,19 @@ export type WidgetProps = {
   pendingTs: number[]
   /** False on iOS 16, where widget buttons are unavailable; the widget hides +1. */
   interactive: boolean
+  /** Average gap between cigarettes, already formatted ("36M"), or null without enough data. */
+  avgGapLabel: string | null
+  /** When the next nudge is due (ms). The widget counts down to it with a system timer. */
+  nextAt: number | null
+  /** Rotating home-screen copy ("GO ON THEN."). Picked at sync time. */
+  line: string
+}
+
+export type SnapshotExtras = {
+  interactive?: boolean
+  avgGapMs?: number | null
+  nextAt?: number | null
+  line?: string
 }
 
 export type WidgetTimelineItem = { date: Date; props: WidgetProps }
@@ -28,10 +41,16 @@ const isSameLocalDay = (ts: number, now: Date): boolean => toCalendarDateString(
  * Builds the widget props from today's stored entries plus any not-yet-merged taps.
  * Pending taps made today still count, so the widget never shows less than the user tapped.
  */
-export const buildSnapshot = (todayEntries: TLogEntry[], pendingTs: number[], now: Date, interactive = true): WidgetProps => {
+export const buildSnapshot = (todayEntries: TLogEntry[], pendingTs: number[], now: Date, extras: SnapshotExtras = {}): WidgetProps => {
   const todayTs = [...todayEntries.map((e) => e.ts), ...pendingTs.filter((ts) => isSameLocalDay(ts, now))]
   const unique = Array.from(new Set(todayTs))
-  return { todayCount: unique.length, lastLoggedAt: unique.length > 0 ? Math.max(...unique) : null, pendingTs, interactive }
+  return { todayCount: unique.length, lastLoggedAt: unique.length > 0 ? Math.max(...unique) : null,
+    pendingTs,
+    interactive: extras.interactive ?? true,
+    avgGapLabel: extras.avgGapMs ? formatTimeUntil(extras.avgGapMs) : null,
+    nextAt: extras.nextAt ?? null,
+    line: extras.line ?? '',
+  }
 }
 
 /**
@@ -42,7 +61,16 @@ export const buildSnapshot = (todayEntries: TLogEntry[], pendingTs: number[], no
  */
 export const buildTimeline = (snapshot: WidgetProps, now: Date): WidgetTimelineItem[] => [
   { date: now, props: snapshot },
-  { date: startOfNextDay(now), props: { todayCount: 0, lastLoggedAt: snapshot.lastLoggedAt, pendingTs: [], interactive: snapshot.interactive } },
+  {
+    date: startOfNextDay(now),
+    props: {
+      ...snapshot,
+      todayCount: 0,
+      pendingTs: [],
+      // A nudge time that has already passed by midnight is stale.
+      nextAt: snapshot.nextAt !== null && snapshot.nextAt > startOfNextDay(now).getTime() ? snapshot.nextAt : null,
+    },
+  },
 ]
 
 // ─── Pending queue ────────────────────────────────────────────────────────────
@@ -84,3 +112,12 @@ export const carryForward = (latestPending: number[], mergedPending: number[]): 
   const merged = new Set(mergedPending)
   return latestPending.filter((ts) => !merged.has(ts))
 }
+
+/**
+ * The native side persists timeline props in UserDefaults, which cannot store null, so null fields
+ * are dropped before writing. The widget reads a missing field as "no value".
+ */
+export const stripNulls = (item: WidgetTimelineItem): WidgetTimelineItem => ({
+  date: item.date,
+  props: Object.fromEntries(Object.entries(item.props).filter(([, v]) => v !== null && v !== undefined)) as unknown as WidgetProps,
+})

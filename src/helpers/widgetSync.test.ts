@@ -1,5 +1,5 @@
 import { TLogEntry } from '@/types'
-import { buildSnapshot, buildTimeline, carryForward, collectPending, mergePending, startOfNextDay } from './widgetSync'
+import { buildSnapshot, buildTimeline, carryForward, collectPending, stripNulls, mergePending, startOfNextDay } from './widgetSync'
 
 const at = (h: number, m = 0, day = 15) => new Date(2026, 5, day, h, m, 0, 0)
 const e = (ts: number): TLogEntry => ({ id: String(ts), ts })
@@ -8,11 +8,11 @@ describe('buildSnapshot', () => {
   it('counts today entries and tracks the latest', () => {
     const now = at(12)
     const snap = buildSnapshot([e(at(8).getTime()), e(at(10).getTime())], [], now)
-    expect(snap).toEqual({ todayCount: 2, lastLoggedAt: at(10).getTime(), pendingTs: [], interactive: true })
+    expect(snap).toMatchObject({ todayCount: 2, lastLoggedAt: at(10).getTime(), pendingTs: [], interactive: true })
   })
 
   it('is empty with no entries', () => {
-    expect(buildSnapshot([], [], at(12))).toEqual({ todayCount: 0, lastLoggedAt: null, pendingTs: [], interactive: true })
+    expect(buildSnapshot([], [], at(12))).toMatchObject({ todayCount: 0, lastLoggedAt: null, pendingTs: [], interactive: true })
   })
 
   it('counts pending taps from today once, even if also stored', () => {
@@ -31,10 +31,30 @@ describe('buildSnapshot', () => {
   })
 })
 
+describe('dashboard extras', () => {
+  it('formats the average gap and keeps the nudge fields', () => {
+    const snap = buildSnapshot([], [], at(12), { avgGapMs: 36 * 60000, nextAt: at(13).getTime(), line: 'GO ON THEN.' })
+    expect(snap).toMatchObject({ avgGapLabel: '36M', nextAt: at(13).getTime(), line: 'GO ON THEN.' })
+  })
+
+  it('has no gap label or nudge time by default', () => {
+    expect(buildSnapshot([], [], at(12))).toMatchObject({ avgGapLabel: null, nextAt: null, line: '' })
+  })
+
+  it('drops a nudge time that is before midnight on the midnight entry, keeps one after', () => {
+    const now = at(18)
+    const before = buildTimeline(buildSnapshot([], [], now, { nextAt: at(20).getTime() }), now)
+    expect(before[0].props.nextAt).toBe(at(20).getTime())
+    expect(before[1].props.nextAt).toBeNull()
+    const after = buildTimeline(buildSnapshot([], [], now, { nextAt: at(8, 0, 16).getTime() }), now)
+    expect(after[1].props.nextAt).toBe(at(8, 0, 16).getTime())
+  })
+})
+
 describe('buildTimeline', () => {
   it('carries interactive=false across midnight', () => {
     const now = at(18)
-    expect(buildTimeline(buildSnapshot([], [], now, false), now)[1].props.interactive).toBe(false)
+    expect(buildTimeline(buildSnapshot([], [], now, { interactive: false }), now)[1].props.interactive).toBe(false)
   })
 
   it('adds a midnight entry that resets the count but keeps lastLoggedAt', () => {
@@ -44,7 +64,7 @@ describe('buildTimeline', () => {
     expect(first.props).toEqual(snap)
     expect(midnight.date).toEqual(startOfNextDay(now))
     expect(midnight.date.getHours()).toBe(0)
-    expect(midnight.props).toEqual({ todayCount: 0, lastLoggedAt: at(17).getTime(), pendingTs: [], interactive: true })
+    expect(midnight.props).toMatchObject({ todayCount: 0, lastLoggedAt: at(17).getTime(), pendingTs: [], interactive: true })
   })
 })
 
@@ -128,5 +148,21 @@ describe('carryForward', () => {
 
   it('returns nothing when everything was merged', () => {
     expect(carryForward([1, 2], [1, 2])).toEqual([])
+  })
+})
+
+describe('stripNulls', () => {
+  it('drops null fields so UserDefaults can store the props', () => {
+    const item = buildTimeline(buildSnapshot([], [], at(12)), at(12))[0]
+    const stripped = stripNulls(item)
+    expect(stripped.props).not.toHaveProperty('lastLoggedAt')
+    expect(stripped.props).not.toHaveProperty('nextAt')
+    expect(stripped.props).not.toHaveProperty('avgGapLabel')
+    expect(stripped.props).toMatchObject({ todayCount: 0, pendingTs: [], interactive: true })
+  })
+
+  it('keeps real values and falsy numbers', () => {
+    const item = { date: at(12), props: { ...buildSnapshot([], [], at(12)), todayCount: 0, nextAt: 5 } }
+    expect(stripNulls(item).props).toMatchObject({ todayCount: 0, nextAt: 5 })
   })
 })
