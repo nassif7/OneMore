@@ -4,6 +4,7 @@ import {
   setupNotificationHandler,
 } from "@/services/notifications";
 import { markSplashSeen, shouldPlaySplash } from "@/services/settings";
+import { startWidgetSync } from "@/services/widget";
 import { BebasNeue_400Regular, useFonts } from "@expo-google-fonts/bebas-neue";
 import { SpaceMono_700Bold } from "@expo-google-fonts/space-mono";
 import Constants from "expo-constants";
@@ -36,6 +37,8 @@ export default function RootLayout() {
       .catch(() => false)
       .then(setPlaySplash);
   }, [version]);
+
+  useEffect(() => startWidgetSync(), []);
 
   useEffect(() => {
     requestNotificationPermission();

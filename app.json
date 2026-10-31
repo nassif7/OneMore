@@ -42,7 +42,24 @@
       "@react-native-community/datetimepicker",
       "expo-image",
       "./plugins/withPodDeploymentTargetFix.js",
-      ["expo-build-properties", { "ios": { "deploymentTarget": "16.4" } }]
+      ["expo-build-properties", { "ios": { "deploymentTarget": "16.4" } }],
+      [
+        "expo-widgets",
+        {
+          "groupIdentifier": "group.pro.nassif.onemore",
+          "widgets": [
+            {
+              "name": "OneMoreWidget",
+              "displayName": "OneMore",
+              "description": "Today's count and time since your last one.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular"],
+                "contentMarginsDisabled": true
+              }
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

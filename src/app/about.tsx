@@ -3,6 +3,7 @@ import useQuickTagPromptEnabled from '@/hooks/useQuickTagPromptEnabled'
 import useTagsEnabled from '@/hooks/useTagsEnabled'
 import { clearDemoData, seedDemoData } from '@/services/devSeed'
 import { clearAllData } from '@/services/storage'
+import { syncWidget } from '@/services/widget'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { Globe, RotateCcw } from 'lucide-react-native'
@@ -22,6 +23,7 @@ export default function AboutScreen() {
   const handleSeedDemo = async () => {
     try {
       const seeded = await seedDemoData()
+      syncWidget()
       Alert.alert('DEMO DATA', seeded > 0 ? `Filled in ${seeded} empty day(s).` : 'No empty days in range — nothing added.')
     } catch (error) {
       console.error('[AboutScreen] Failed to seed demo data:', error)
@@ -32,6 +34,7 @@ export default function AboutScreen() {
   const handleClearDemo = async () => {
     try {
       await clearDemoData()
+      syncWidget()
       Alert.alert('DEMO DATA', 'Removed.')
     } catch (error) {
       console.error('[AboutScreen] Failed to clear demo data:', error)
@@ -51,6 +54,7 @@ export default function AboutScreen() {
   const handleResetConfirm = async () => {
     try {
       await clearAllData()
+      syncWidget()
       setResetVisible(false)
       router.replace('/')
     } catch (error) {

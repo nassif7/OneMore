@@ -10,6 +10,7 @@ import useTagsEnabled from '@/hooks/useTagsEnabled'
 import { computePattern } from '@/services/patternCalculator'
 import { formatTime } from '@/services/stats'
 import { addLog, deleteLog, editLog, setTag } from '@/services/storage'
+import { syncWidget } from '@/services/widget'
 import { TagId, TLogEntry } from '@/types'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -52,6 +53,7 @@ export default function HistoryScreen() {
     try {
       await addLog(selectedDate, addTime.getTime(), addTag)
       setIsAdding(false)
+      syncWidget()
       reload()
     } catch (error) {
       console.error('[HistoryScreen] Failed to add log:', error)
@@ -67,6 +69,7 @@ export default function HistoryScreen() {
     try {
       await deleteLog(selectedDate, deletingEntry.id)
       setDeletingEntry(null)
+      syncWidget()
       reload()
     } catch (error) {
       console.error('[HistoryScreen] Failed to delete log:', error)
@@ -89,6 +92,7 @@ export default function HistoryScreen() {
       await editLog(selectedDate, editingEntry.id, editTime.getTime())
       if (editTag !== editingEntry.tag) await setTag(selectedDate, editingEntry.id, editTag)
       setEditingEntry(null)
+      syncWidget()
       reload()
     } catch (error) {
       console.error('[HistoryScreen] Failed to edit log:', error)
