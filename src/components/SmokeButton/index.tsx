@@ -1,12 +1,12 @@
 import { SmokeButtonProps } from '@/types'
-import React, { useRef } from 'react'
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react'
+import { Animated, StyleSheet, Text, TouchableOpacity, useAnimatedValue, View } from 'react-native'
 
 // ─── Smoke Button ─────────────────────────────────────────────────────────────
 
 export default function SmokeButton({ onPress }: SmokeButtonProps) {
-  const buttonScale = useRef(new Animated.Value(1)).current
-  const flashOpacity = useRef(new Animated.Value(0)).current
+  const buttonScale = useAnimatedValue(1)
+  const flashOpacity = useAnimatedValue(0)
 
   const handlePress = async (): Promise<void> => {
     // Button slam

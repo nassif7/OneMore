@@ -32,7 +32,8 @@ export default function HistoryScreen() {
   const [addTime, setAddTime] = useState<Date>(new Date())
   const [addTag, setAddTag] = useState<TagId | undefined>(undefined)
 
-  const entries = useMemo(() => (entry?.entries ? [...entry.entries].reverse() : []), [entry?.entries])
+  const entryList = entry?.entries
+  const entries = useMemo(() => (entryList ? [...entryList].reverse() : []), [entryList])
   const dateStr = toCalendarDateString(selectedDate)
 
   useEffect(() => {
