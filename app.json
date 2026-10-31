@@ -2,7 +2,7 @@
   "expo": {
     "name": "OneMore",
     "slug": "OneMore",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "onemore",
@@ -42,7 +42,14 @@
       "@react-native-community/datetimepicker",
       "expo-image",
       "./plugins/withPodDeploymentTargetFix.js",
-      ["expo-build-properties", { "ios": { "deploymentTarget": "16.4" } }],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.4"
+          }
+        }
+      ],
       [
         "expo-widgets",
         {
@@ -53,7 +60,12 @@
               "displayName": "OneMore",
               "description": "Today's count and time since your last one.",
               "ios": {
-                "supportedFamilies": ["systemSmall", "systemMedium", "accessoryCircular", "accessoryRectangular"],
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryCircular",
+                  "accessoryRectangular"
+                ],
                 "contentMarginsDisabled": true
               }
             }
