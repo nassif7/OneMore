@@ -6,8 +6,8 @@ import { clearAllData } from '@/services/storage'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { Globe, RotateCcw } from 'lucide-react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, useAnimatedValue, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const PROJECTS_URL = 'https://nassif.pro/projects'
@@ -17,7 +17,7 @@ export default function AboutScreen() {
   const { enabled: tagsEnabled, setEnabled: setTagsEnabled } = useTagsEnabled()
   const { enabled: quickPromptEnabled, setEnabled: setQuickPromptEnabled } = useQuickTagPromptEnabled()
   const { bottom } = useSafeAreaInsets()
-  const cursorOpacity = useRef(new Animated.Value(1)).current
+  const cursorOpacity = useAnimatedValue(1)
 
   const handleSeedDemo = async () => {
     try {
