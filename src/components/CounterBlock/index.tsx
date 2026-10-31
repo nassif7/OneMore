@@ -7,7 +7,7 @@ export default function CounterBlock({ count, avgGap, timeSinceLast }: CounterBl
     <View style={styles.container}>
       {/* Count */}
       <View>
-        <Text style={styles.label}>TODAY'S COUNT</Text>
+        <Text style={styles.label}>TODAY&apos;S COUNT</Text>
         <Text style={styles.countNumber}>{count}</Text>
       </View>
 

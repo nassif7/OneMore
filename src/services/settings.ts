@@ -1,4 +1,4 @@
-import { QUICK_TAG_PROMPT_ENABLED_KEY, TAG_SKIP_NUDGE_SHOWN_KEY, TAGS_ENABLED_KEY } from '@/constants'
+import { QUICK_TAG_PROMPT_ENABLED_KEY, SPLASH_SEEN_VERSION_KEY, TAG_SKIP_NUDGE_SHOWN_KEY, TAGS_ENABLED_KEY } from '@/constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // ─── Tags Enabled ─────────────────────────────────────────────────────────────
@@ -39,4 +39,17 @@ export const getSkipNudgeShown = async (): Promise<boolean> => {
 
 export const setSkipNudgeShown = async (): Promise<void> => {
   await AsyncStorage.setItem(TAG_SKIP_NUDGE_SHOWN_KEY, 'true')
+}
+
+// ─── Splash Animation ─────────────────────────────────────────────────────────
+// The full animated splash only plays on first install and after an app
+// update; otherwise launches go straight to the home screen.
+
+export const shouldPlaySplash = async (version: string): Promise<boolean> => {
+  const seen = await AsyncStorage.getItem(SPLASH_SEEN_VERSION_KEY)
+  return seen !== version
+}
+
+export const markSplashSeen = async (version: string): Promise<void> => {
+  await AsyncStorage.setItem(SPLASH_SEEN_VERSION_KEY, version)
 }

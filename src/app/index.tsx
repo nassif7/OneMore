@@ -7,7 +7,6 @@ import useSmokeLogger from '@/hooks/useSmokeLogger'
 import useTagsEnabled from '@/hooks/useTagsEnabled'
 import useTodayTimes from '@/hooks/useTodayTimes'
 import { getNextNotificationTime } from '@/services/notifications'
-import { computePattern } from '@/services/patternCalculator'
 import { getSkipNudgeShown, setSkipNudgeShown } from '@/services/settings'
 import { getAvgGap, getTimeSinceLast } from '@/services/stats'
 import { setTag } from '@/services/storage'
@@ -17,8 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 export default function HomeScreen() {
-  const [avgGapMs, setAvgGapMs] = useState<number | null>(null)
-  const [nextNotificationTime, setNextNotificationTime] = useState<number | null>(null)
+    const [nextNotificationTime, setNextNotificationTime] = useState<number | null>(null)
   const [quickTagEntry, setQuickTagEntry] = useState<TLogEntry | null>(null)
   const [skipNudgeShown, setSkipNudgeShownState] = useState<boolean>(true)
   const { entries, setEntries } = useTodayTimes()
@@ -27,8 +25,7 @@ export default function HomeScreen() {
 
   const loadNudgeData = useCallback(async () => {
     try {
-      const [pattern, time] = await Promise.all([computePattern(), getNextNotificationTime()])
-      setAvgGapMs(pattern.avgGapMs)
+      const time = await getNextNotificationTime()
       setNextNotificationTime(time)
     } catch (error) {
       console.error('[HomeScreen] Failed to load nudge data:', error)
