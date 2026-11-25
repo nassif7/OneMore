@@ -117,7 +117,7 @@ const OneMoreWidget = (props: WidgetProps, environment: WidgetEnvironment) => {
           <VStack alignment="leading" spacing={4}>
             <VStack alignment="leading" spacing={7}>
               <Text modifiers={label}>AVG GAP</Text>
-              <Text modifiers={stat}>{props.avgGapLabel ?? '--'}</Text>
+              <Text modifiers={stat}>{props.avgGapLabel ?? 'N/A'}</Text>
             </VStack>
             <VStack alignment="leading" spacing={7}>
               <Text modifiers={label}>LAST ONE</Text>
