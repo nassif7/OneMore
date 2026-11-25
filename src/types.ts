@@ -64,11 +64,13 @@ export interface SmokeButtonProps {
 export interface StatsComparisonProps {
   current: StatsComparisonData
   previous: StatsComparisonData | null
-  periodLabel: string // e.g. "THIS WEEK" or "THIS MONTH"
+  periodLabel: string // e.g. "THIS MONTH"; empty when a surrounding title already names the period
 }
 
 export interface StatGridProps {
   stats: TStatCell[]
+  /** Smaller padding and numbers, for the one-row TODAY summary. */
+  compact?: boolean
 }
 
 export interface TimePickerSheetProps {

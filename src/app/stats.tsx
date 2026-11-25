@@ -1,35 +1,32 @@
-import { BottomNav, ScreenHeader } from '@/components'
+import { BottomNav, ScreenHeader, StatsComparison, TagBreakdown } from '@/components'
+import BottomSheet from '@/components/BottomSheet'
 import MonthCalendar from '@/components/MonthCalendar'
+import MonthStrip from '@/components/MonthStrip'
+import PeriodSummary from '@/components/PeriodSummary'
 import StatGrid from '@/components/StatGrid'
-import TagBreakdown from '@/components/TagBreakdown'
-import { TStatCell } from '@/types'
-import StatsComparison from '@/components/StatsComparison'
-import WeekBarChart from '@/components/WeekBarChart'
+import StatsCard from '@/components/StatsCard'
+import TriggersPreview from '@/components/TriggersPreview'
+import WeekSheet from '@/components/WeekSheet'
+import WeekSparkline from '@/components/WeekSparkline'
+import { TAG_MAP } from '@/constants/tags'
+import { getTopTags, upperGap } from '@/helpers'
 import useStatsData from '@/hooks/useStatsData'
 import useTagsEnabled from '@/hooks/useTagsEnabled'
-import { router } from 'expo-router'
-import React, { useMemo, useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { TStatCell } from '@/types'
+import { router, useFocusEffect } from 'expo-router'
+import React, { useCallback, useMemo, useState } from 'react'
+import { ScrollView, StyleSheet, View } from 'react-native'
 
-type TView = 'WEEK' | 'MONTH'
-
-let savedView: TView = 'WEEK'
+type TSheet = 'WEEK' | 'MONTH' | 'TRIGGERS' | null
 
 export default function StatsScreen() {
-  const [weekOffset, setWeekOffset] = useState(0)
-  const [view, setView] = useState<TView>(savedView)
+  const [sheet, setSheet] = useState<TSheet>(null)
   const { enabled: tagsEnabled } = useTagsEnabled()
-
-  const handleViewChange = (v: TView) => {
-    savedView = v
-    setView(v)
-  }
   const {
     weekData,
     stats,
     currentWeekStats,
     prevWeekStats,
-    weekLabel,
     monthData,
     allTimeDailyAvg,
     allTimeAvgGap,
@@ -38,7 +35,12 @@ export default function StatsScreen() {
     currentMonthStats,
     prevMonthStats,
     tagBreakdown,
-  } = useStatsData(weekOffset)
+  } = useStatsData(0)
+
+  // Sheets are modals over this screen; close them when navigating away (e.g. to a day in History).
+  useFocusEffect(useCallback(() => () => setSheet(null), []))
+
+  const closeSheet = () => setSheet(null)
 
   const statCells: TStatCell[] = useMemo(
     () => [
@@ -51,69 +53,77 @@ export default function StatsScreen() {
       },
       {
         label: 'TODAY GAP',
-        value: stats.avgGap,
+        value: upperGap(stats.avgGap),
         unit: 'BETWEEN',
         bg: '#fff',
         isAbove:
           todayAvgGapMinutes !== null && allTimeAvgGapMinutes !== null && todayAvgGapMinutes < allTimeAvgGapMinutes,
       },
       { label: 'DAILY AVG', value: allTimeDailyAvg, unit: 'CIGS/DAY', bg: '#F5F0E8' },
-      { label: 'AVG GAP', value: allTimeAvgGap, unit: 'ALL TIME', bg: '#F5F0E8' },
+      { label: 'AVG GAP', value: upperGap(allTimeAvgGap), unit: 'ALL TIME', bg: '#F5F0E8' },
     ],
     [stats, allTimeDailyAvg, allTimeAvgGap, todayAvgGapMinutes, allTimeAvgGapMinutes],
   )
 
-  const handleDayPress = (dateStr: string) => {
-    router.push({ pathname: '/history', params: { date: dateStr } })
-  }
+  const periodLabel = (name: string, dailyAvg: number) =>
+    dailyAvg > 0 ? `${name}, ${dailyAvg} cigarettes per day, open details` : `${name}, no data yet, open details`
+
+  const topTags = getTopTags(tagBreakdown, 3)
+  const triggersLabel =
+    topTags.length > 0
+      ? `Triggers, top: ${topTags.map((t) => `${TAG_MAP[t.tag].label.toLowerCase()} ${t.count}`).join(', ')}, open details`
+      : 'Triggers, no data yet, open details'
 
   return (
     <View style={styles.container}>
       <ScreenHeader showBack onAbout={() => router.push('/about')} />
 
-      <StatGrid stats={statCells} />
+      <ScrollView bounces={false} showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <StatGrid stats={statCells} compact />
 
-      {/* Toggle */}
-      <View style={styles.toggle}>
-        {(['WEEK', 'MONTH'] as TView[]).map((v) => (
-          <TouchableOpacity
-            key={v}
-            onPress={() => handleViewChange(v)}
-            style={[styles.toggleBtn, view === v && styles.toggleBtnActive]}
-          >
-            <Text style={[styles.toggleText, view === v && styles.toggleTextActive]}>{v}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        <StatsCard
+          title="THIS WEEK"
+          accessibilityLabel={periodLabel('This week', currentWeekStats.dailyAvg)}
+          onPress={() => setSheet('WEEK')}
+        >
+          <PeriodSummary current={currentWeekStats} previous={prevWeekStats} />
+          <WeekSparkline data={weekData} />
+        </StatsCard>
 
-      {/* Period stats — above chart, changes with view */}
-      <StatsComparison
-        current={view === 'WEEK' ? currentWeekStats : currentMonthStats}
-        previous={view === 'WEEK' ? prevWeekStats : prevMonthStats}
-        periodLabel={view === 'WEEK' ? 'THIS WEEK' : 'THIS MONTH'}
-      />
-      {/* Chart */}
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1 }}>
-          {view === 'WEEK' ? (
-            <WeekBarChart
-              data={weekData}
-              weekLabel={weekLabel}
-              currentWeekStats={currentWeekStats}
-              prevWeekStats={prevWeekStats}
-              onPrevWeek={() => setWeekOffset((o) => o - 1)}
-              onNextWeek={() => setWeekOffset((o) => o + 1)}
-              canGoNext={weekOffset < 0}
-              onDayPress={handleDayPress}
-            />
-          ) : (
-            <MonthCalendar monthData={monthData} dailyAvg={currentMonthStats.dailyAvg} />
-          )}
-        </View>
-        {tagsEnabled && <TagBreakdown data={tagBreakdown} />}
+        <StatsCard
+          title="THIS MONTH"
+          accessibilityLabel={periodLabel('This month', currentMonthStats.dailyAvg)}
+          onPress={() => setSheet('MONTH')}
+        >
+          <PeriodSummary current={currentMonthStats} previous={prevMonthStats} />
+          <MonthStrip monthData={monthData} />
+        </StatsCard>
+
+        {tagsEnabled && (
+          <StatsCard title="TRIGGERS" accessibilityLabel={triggersLabel} onPress={() => setSheet('TRIGGERS')}>
+            <TriggersPreview data={tagBreakdown} />
+          </StatsCard>
+        )}
       </ScrollView>
 
       <BottomNav />
+
+      <WeekSheet
+        visible={sheet === 'WEEK'}
+        onClose={closeSheet}
+        onDayPress={(dateStr) => router.push({ pathname: '/history', params: { date: dateStr } })}
+      />
+
+      <BottomSheet visible={sheet === 'MONTH'} title="THIS MONTH" onClose={closeSheet}>
+        <StatsComparison current={currentMonthStats} previous={prevMonthStats} periodLabel="THIS MONTH" />
+        <View style={styles.sheetBody}>
+          <MonthCalendar monthData={monthData} dailyAvg={currentMonthStats.dailyAvg} />
+        </View>
+      </BottomSheet>
+
+      <BottomSheet visible={sheet === 'TRIGGERS'} title="TRIGGERS" onClose={closeSheet}>
+        <TagBreakdown data={tagBreakdown} />
+      </BottomSheet>
     </View>
   )
 }
@@ -125,29 +135,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F0E8',
   },
-  toggle: {
-    flexDirection: 'row',
-    marginHorizontal: 20,
-    marginVertical: 12,
-    borderWidth: 3,
-    borderColor: '#000',
+  content: {
+    paddingBottom: 12,
   },
-  toggleBtn: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  toggleBtnActive: {
-    backgroundColor: '#000',
-  },
-  toggleText: {
-    fontFamily: 'BebasNeue',
-    fontSize: 18,
-    letterSpacing: 2,
-    color: '#000',
-  },
-  toggleTextActive: {
-    color: '#fff',
+  sheetBody: {
+    padding: 20,
   },
 })

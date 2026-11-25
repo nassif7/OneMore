@@ -1,18 +1,25 @@
+import { deltaPercent } from '@/helpers'
 import { StatsComparisonProps } from '@/types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 // ─── Delta Pill ───────────────────────────────────────────────────────────────
 
-function DeltaPill({ current, previous, invert = false }: { current: number; previous: number; invert?: boolean }) {
-  if (!previous) return null
-  const delta = Math.round(((current - previous) / previous) * 100)
-  if (delta === 0) return null
+export function DeltaPill({
+  current,
+  previous,
+  invert = false,
+}: {
+  current: number | null
+  previous: number | null
+  invert?: boolean
+}) {
+  const delta = deltaPercent(current, previous)
+  if (delta === null || delta === 0) return null
   const isGood = invert ? delta > 0 : delta < 0
   const arrow = delta > 0 ? '↑' : '↓'
-  const sign = delta > 0 ? '+' : ''
   return (
     <View style={[styles.pill, { backgroundColor: isGood ? '#000' : '#C0392B' }]}>
-      <Text style={styles.pillText}>{`${arrow} ${sign}${delta}%`}</Text>
+      <Text style={styles.pillText}>{`${arrow}${Math.abs(delta)}%`}</Text>
     </View>
   )
 }
@@ -29,7 +36,7 @@ function StatCell({
 }: {
   label: string
   value: string
-  current: number
+  current: number | null
   previous: number | null
   invert?: boolean
   isAbove?: boolean
@@ -59,17 +66,17 @@ export default function StatsComparison({ current, previous, periodLabel }: Stat
   return (
     <View style={styles.container}>
       <StatCell
-        label={`${periodLabel} AVG`}
+        label={periodLabel ? `${periodLabel} AVG` : 'AVG'}
         value={current.dailyAvg > 0 ? `${current.dailyAvg} CIGS` : '—'}
-        current={current.dailyAvg}
-        previous={previous?.dailyAvg ?? null}
+        current={current.dailyAvg || null}
+        previous={previous?.dailyAvg || null}
         isAbove={dailyAvgAbove}
       />
       <View style={styles.divider} />
       <StatCell
-        label={`${periodLabel} GAP`}
+        label={periodLabel ? `${periodLabel} GAP` : 'GAP'}
         value={current.avgGapLabel}
-        current={current.avgGapMinutes ?? 0}
+        current={current.avgGapMinutes}
         previous={previous?.avgGapMinutes ?? null}
         invert
         isAbove={avgGapAbove}
