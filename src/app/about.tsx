@@ -11,7 +11,8 @@ import React, { useEffect, useState } from 'react'
 import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, useAnimatedValue, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const PROJECTS_URL = 'https://nassif.pro/projects'
+const PROJECTS_URL = 'https://studio.nassif.pro/en'
+const PRIVACY_URL = 'https://studio.nassif.pro/en/projects/onemore/privacy'
 
 export default function AboutScreen() {
   const [resetVisible, setResetVisible] = useState(false)
@@ -124,7 +125,7 @@ export default function AboutScreen() {
 
         <View style={[styles.footer, { paddingBottom: 32 + (Platform.OS === 'android' ? bottom : 0) }]}>
           <Text style={styles.footerText}>Made by n|N</Text>
-          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://www.nassif.pro/projects/one-more/privacy')}>
+          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>

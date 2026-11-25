@@ -7,11 +7,11 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 export default function Toggle({ value, onChange }: ToggleProps) {
   return (
     <View style={styles.track}>
-      <TouchableOpacity onPress={() => onChange(false)} style={[styles.option, !value && styles.optionActive]}>
-        <Text style={[styles.optionText, !value && styles.optionTextActive]}>OFF</Text>
+      <TouchableOpacity onPress={() => onChange(false)} style={[styles.option, !value && styles.optionOff]}>
+        <Text style={[styles.optionText, !value && styles.optionTextSelected]}>OFF</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => onChange(true)} style={[styles.option, value && styles.optionActive]}>
-        <Text style={[styles.optionText, value && styles.optionTextActive]}>ON</Text>
+      <TouchableOpacity onPress={() => onChange(true)} style={[styles.option, value && styles.optionOn]}>
+        <Text style={[styles.optionText, value && styles.optionTextSelected]}>ON</Text>
       </TouchableOpacity>
     </View>
   )
@@ -32,8 +32,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: '#fff',
   },
-  optionActive: {
+  // Selected segment: ON is black, OFF is red, both with white text. Unselected stays white/black.
+  optionOn: {
     backgroundColor: '#000',
+  },
+  optionOff: {
+    backgroundColor: '#C0392B',
   },
   optionText: {
     fontFamily: 'BebasNeue',
@@ -41,7 +45,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: '#000',
   },
-  optionTextActive: {
+  optionTextSelected: {
     color: '#fff',
   },
 })

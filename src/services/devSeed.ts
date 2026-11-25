@@ -68,6 +68,7 @@ const generateDayEntries = (date: Date, now: Date): TLogEntry[] => {
 }
 
 export const seedDemoData = async (days: number = 30): Promise<number> => {
+  if (!__DEV__) return 0 // never write demo data in a production build
   const now = new Date()
   const seededKeys: string[] = []
 
@@ -94,6 +95,7 @@ export const seedDemoData = async (days: number = 30): Promise<number> => {
 }
 
 export const clearDemoData = async (): Promise<void> => {
+  if (!__DEV__) return
   const stored = await AsyncStorage.getItem(DEMO_SEEDED_DAYS_KEY)
   if (!stored) return
 
