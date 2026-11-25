@@ -11,7 +11,6 @@ export default function TagBreakdown({ data }: TagBreakdownProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>WHEN DO YOU SMOKE?</Text>
       {tagged.length === 0 ? (
         <Text style={styles.emptyText}>NO MOOD DATA YET.</Text>
       ) : (
@@ -51,15 +50,6 @@ TagBreakdown.displayName = 'TagBreakdown'
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    borderBottomWidth: 3,
-    borderColor: '#000',
-  },
-  title: {
-    fontFamily: 'SpaceMono',
-    fontSize: 10,
-    letterSpacing: 3,
-    color: '#000',
-    marginBottom: 16,
   },
   emptyText: {
     fontFamily: 'SpaceMono',

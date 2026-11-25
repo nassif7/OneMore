@@ -11,7 +11,8 @@ import React, { useEffect, useState } from 'react'
 import { Alert, Animated, Linking, Platform, StyleSheet, Text, TouchableOpacity, useAnimatedValue, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const PROJECTS_URL = 'https://nassif.pro/projects'
+const PROJECTS_URL = 'https://studio.nassif.pro/en'
+const PRIVACY_URL = 'https://studio.nassif.pro/en/projects/onemore/privacy'
 
 export default function AboutScreen() {
   const [resetVisible, setResetVisible] = useState(false)
@@ -79,16 +80,8 @@ export default function AboutScreen() {
 
         <View style={styles.settingsSection}>
           <Text style={styles.settingsTitle}>SETTINGS</Text>
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>MOOD TAGS</Text>
-            <Toggle value={tagsEnabled} onChange={setTagsEnabled} />
-          </View>
-          {tagsEnabled && (
-            <View style={[styles.settingRow, styles.settingRowNested]}>
-              <Text style={styles.settingSubLabel}>ASK AFTER LOGGING</Text>
-              <Toggle value={quickPromptEnabled} onChange={setQuickPromptEnabled} />
-            </View>
-          )}
+          <Toggle label="MOOD TAGS" value={tagsEnabled} onChange={setTagsEnabled} />
+          {tagsEnabled && <Toggle label="ASK AFTER LOGGING" nested value={quickPromptEnabled} onChange={setQuickPromptEnabled} />}
         </View>
 
         <TouchableOpacity style={styles.kofiButton} onPress={() => Linking.openURL(PROJECTS_URL)}>
@@ -124,7 +117,7 @@ export default function AboutScreen() {
 
         <View style={[styles.footer, { paddingBottom: 32 + (Platform.OS === 'android' ? bottom : 0) }]}>
           <Text style={styles.footerText}>Made by n|N</Text>
-          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync('https://www.nassif.pro/projects/one-more/privacy')}>
+          <TouchableOpacity onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>
             <Text style={styles.privacyLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
@@ -199,30 +192,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 14,
     paddingBottom: 4,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  settingRowNested: {
-    borderTopWidth: 2,
-    borderColor: '#000',
-    paddingLeft: 28,
-  },
-  settingLabel: {
-    fontFamily: 'BebasNeue',
-    fontSize: 20,
-    letterSpacing: 1,
-    color: '#000',
-  },
-  settingSubLabel: {
-    fontFamily: 'SpaceMono',
-    fontSize: 12,
-    letterSpacing: 1,
-    color: '#333',
   },
   kofiButton: {
     flexDirection: 'row',
