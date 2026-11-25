@@ -32,13 +32,13 @@ describe('buildSnapshot', () => {
 })
 
 describe('dashboard extras', () => {
-  it('formats the average gap and keeps the nudge fields', () => {
-    const snap = buildSnapshot([], [], at(12), { avgGapMs: 36 * 60000, nextAt: at(13).getTime(), line: 'GO ON THEN.' })
-    expect(snap).toMatchObject({ avgGapLabel: '36M', nextAt: at(13).getTime(), line: 'GO ON THEN.' })
+  it('shows today\'s average gap and keeps the nudge fields', () => {
+    const snap = buildSnapshot([e(at(9).getTime()), e(at(9, 36).getTime())], [], at(12), { nextAt: at(13).getTime(), line: 'GO ON THEN.' })
+    expect(snap).toMatchObject({ avgGapLabel: '36m', nextAt: at(13).getTime(), line: 'GO ON THEN.' })
   })
 
-  it('has no gap label or nudge time by default', () => {
-    expect(buildSnapshot([], [], at(12))).toMatchObject({ avgGapLabel: null, nextAt: null, line: '' })
+  it('has the N/A gap label and no nudge time by default', () => {
+    expect(buildSnapshot([], [], at(12))).toMatchObject({ avgGapLabel: 'N/A', nextAt: null, line: '' })
   })
 
   it('drops a nudge time that is before midnight on the midnight entry, keeps one after', () => {
@@ -59,12 +59,13 @@ describe('buildTimeline', () => {
 
   it('adds a midnight entry that resets the count but keeps lastLoggedAt', () => {
     const now = at(18)
-    const snap = buildSnapshot([e(at(17).getTime())], [], now)
+    const snap = buildSnapshot([e(at(16).getTime()), e(at(17).getTime())], [], now)
+    expect(snap.avgGapLabel).toBe('1h 0m')
     const [first, midnight] = buildTimeline(snap, now)
     expect(first.props).toEqual(snap)
     expect(midnight.date).toEqual(startOfNextDay(now))
     expect(midnight.date.getHours()).toBe(0)
-    expect(midnight.props).toMatchObject({ todayCount: 0, lastLoggedAt: at(17).getTime(), pendingTs: [], interactive: true })
+    expect(midnight.props).toMatchObject({ todayCount: 0, avgGapLabel: 'N/A', lastLoggedAt: at(17).getTime(), pendingTs: [], interactive: true })
   })
 })
 
@@ -157,7 +158,7 @@ describe('stripNulls', () => {
     const stripped = stripNulls(item)
     expect(stripped.props).not.toHaveProperty('lastLoggedAt')
     expect(stripped.props).not.toHaveProperty('nextAt')
-    expect(stripped.props).not.toHaveProperty('avgGapLabel')
+    expect(stripped.props).toHaveProperty('avgGapLabel', 'N/A')
     expect(stripped.props).toMatchObject({ todayCount: 0, pendingTs: [], interactive: true })
   })
 

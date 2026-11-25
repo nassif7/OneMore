@@ -1,5 +1,6 @@
 import { TLogEntry } from '@/types'
-import { formatTimeUntil, toCalendarDateString } from './time'
+import { formatAvgGap, NO_GAP_LABEL } from './gap'
+import { toCalendarDateString } from './time'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -10,8 +11,8 @@ export type WidgetProps = {
   pendingTs: number[]
   /** False on iOS 16, where widget buttons are unavailable; the widget hides +1. */
   interactive: boolean
-  /** Average gap between cigarettes, already formatted ("36M"), or null without enough data. */
-  avgGapLabel: string | null
+  /** Today's average gap, formatted exactly like the home screen ("36m"), or "N/A" with fewer than 2 entries. */
+  avgGapLabel: string
   /** When the next nudge is due (ms). The widget counts down to it with a system timer. */
   nextAt: number | null
   /** Rotating home-screen copy ("GO ON THEN."). Picked at sync time. */
@@ -20,7 +21,6 @@ export type WidgetProps = {
 
 export type SnapshotExtras = {
   interactive?: boolean
-  avgGapMs?: number | null
   nextAt?: number | null
   line?: string
 }
@@ -47,7 +47,7 @@ export const buildSnapshot = (todayEntries: TLogEntry[], pendingTs: number[], no
   return { todayCount: unique.length, lastLoggedAt: unique.length > 0 ? Math.max(...unique) : null,
     pendingTs,
     interactive: extras.interactive ?? true,
-    avgGapLabel: extras.avgGapMs ? formatTimeUntil(extras.avgGapMs) : null,
+    avgGapLabel: formatAvgGap(unique),
     nextAt: extras.nextAt ?? null,
     line: extras.line ?? '',
   }
@@ -66,6 +66,7 @@ export const buildTimeline = (snapshot: WidgetProps, now: Date): WidgetTimelineI
     props: {
       ...snapshot,
       todayCount: 0,
+      avgGapLabel: NO_GAP_LABEL,
       pendingTs: [],
       // A nudge time that has already passed by midnight is stale.
       nextAt: snapshot.nextAt !== null && snapshot.nextAt > startOfNextDay(now).getTime() ? snapshot.nextAt : null,

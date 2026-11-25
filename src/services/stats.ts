@@ -1,3 +1,4 @@
+import { formatAvgGap } from '@/helpers/gap'
 import { TLogEntry } from '@/types'
 
 export const formatTime = (ts: number): string => {
@@ -8,13 +9,7 @@ export const formatTime = (ts: number): string => {
   })
 }
 
-export const getAvgGap = (entries: TLogEntry[]): string => {
-  if (entries.length < 2) return 'N/A'
-  const gaps = entries.slice(1).map((e, i) => e.ts - entries[i].ts)
-  const avgMs = gaps.reduce((a, b) => a + b, 0) / gaps.length
-  const mins = Math.round(avgMs / 60000)
-  return mins < 60 ? `${mins}m` : `${Math.floor(mins / 60)}h ${mins % 60}m`
-}
+export const getAvgGap = (entries: TLogEntry[]): string => formatAvgGap(entries.map((e) => e.ts))
 
 export const getTimeSinceLast = (entries: TLogEntry[]): string => {
   if (entries.length === 0) return 'N/A'

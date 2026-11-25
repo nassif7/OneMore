@@ -2,7 +2,6 @@ import { NUDGES } from '@/constants'
 import { toCalendarDateString } from '@/helpers'
 import { buildSnapshot, buildTimeline, carryForward, collectPending, mergePending, stripNulls } from '@/helpers/widgetSync'
 import { getNextNotificationTime } from '@/services/notifications'
-import { computePattern } from '@/services/patternCalculator'
 import { addLog, getDay } from '@/services/storage'
 import { TLogEntry } from '@/types'
 import OneMoreWidget from '@/widgets/OneMoreWidget'
@@ -43,14 +42,11 @@ const doSync = async (): Promise<void> => {
   // 2. Rebuild the snapshot from storage. Re-read the timeline right before writing and keep any
   //    tap that arrived after step 1 queued (carryForward); see its comment for the accepted race.
   const today = await getDay(now)
-  const [avgGapMs, nextAt] = await Promise.all([
-    computePattern().then((p) => p.avgGapMs).catch(() => null),
-    getNextNotificationTime().catch(() => null),
-  ])
+  const nextAt = await getNextNotificationTime().catch(() => null)
   const line = NUDGES[Math.floor(Math.random() * NUDGES.length)]
   const stillPending = carryForward(collectPending(await OneMoreWidget.getTimeline()), pending)
   OneMoreWidget.updateTimeline(
-    buildTimeline(buildSnapshot(today, stillPending, now, { interactive: isInteractive(), avgGapMs, nextAt, line }), now).map(stripNulls),
+    buildTimeline(buildSnapshot(today, stillPending, now, { interactive: isInteractive(), nextAt, line }), now).map(stripNulls),
   )
 
   if (merged > 0) mergedListeners.forEach((l) => l())
