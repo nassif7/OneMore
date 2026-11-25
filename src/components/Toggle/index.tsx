@@ -1,19 +1,32 @@
 import { ToggleProps } from '@/types'
+import * as Haptics from 'expo-haptics'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 // ─── Toggle ───────────────────────────────────────────────────────────────────
+// A settings row with a single-state switch on the right. The box shows the CURRENT state:
+// ON is a pressed-in red button, OFF is an empty cream box. Tapping anywhere on the row flips it.
 
-export default function Toggle({ value, onChange }: ToggleProps) {
+export default function Toggle({ label, value, onChange, nested = false }: ToggleProps) {
+  const handlePress = () => {
+    Haptics.selectionAsync()
+    onChange(!value)
+  }
+
   return (
-    <View style={styles.track}>
-      <TouchableOpacity onPress={() => onChange(false)} style={[styles.option, !value && styles.optionOff]}>
-        <Text style={[styles.optionText, !value && styles.optionTextSelected]}>OFF</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => onChange(true)} style={[styles.option, value && styles.optionOn]}>
-        <Text style={[styles.optionText, value && styles.optionTextSelected]}>ON</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      style={[styles.row, nested && styles.rowNested]}
+      onPress={handlePress}
+      activeOpacity={0.7}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value }}
+      accessibilityLabel={label}
+    >
+      <Text style={nested ? styles.subLabel : styles.label}>{label}</Text>
+      <View style={[styles.box, value ? styles.boxOn : styles.boxOff]}>
+        <Text style={[styles.boxText, value ? styles.boxTextOn : styles.boxTextOff]}>{value ? 'ON' : 'OFF'}</Text>
+      </View>
+    </TouchableOpacity>
   )
 }
 
@@ -22,30 +35,58 @@ Toggle.displayName = 'Toggle'
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  track: {
+  row: {
     flexDirection: 'row',
-    borderWidth: 2,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  rowNested: {
+    borderTopWidth: 2,
     borderColor: '#000',
+    paddingLeft: 28,
   },
-  option: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    backgroundColor: '#fff',
-  },
-  // Selected segment: ON is black, OFF is red, both with white text. Unselected stays white/black.
-  optionOn: {
-    backgroundColor: '#000',
-  },
-  optionOff: {
-    backgroundColor: '#C0392B',
-  },
-  optionText: {
+  label: {
     fontFamily: 'BebasNeue',
-    fontSize: 14,
+    fontSize: 20,
     letterSpacing: 1,
     color: '#000',
   },
-  optionTextSelected: {
+  subLabel: {
+    fontFamily: 'SpaceMono',
+    fontSize: 12,
+    letterSpacing: 1,
+    color: '#333',
+  },
+  // Fixed width so the row doesn't jump between states.
+  box: {
+    width: 64,
+    paddingVertical: 6,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#000',
+  },
+  boxOn: {
+    backgroundColor: '#C0392B',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
+  },
+  boxOff: {
+    backgroundColor: '#F5F0E8',
+  },
+  boxText: {
+    fontFamily: 'BebasNeue',
+    fontSize: 18,
+    letterSpacing: 1,
+  },
+  boxTextOn: {
     color: '#fff',
+  },
+  boxTextOff: {
+    color: '#888',
   },
 })

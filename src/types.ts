@@ -124,8 +124,12 @@ export interface TagBreakdownProps {
 }
 
 export interface ToggleProps {
+  /** Setting name; shown on the row and used as the accessibility label. */
+  label: string
   value: boolean
   onChange: (value: boolean) => void
+  /** Indented sub-setting row (smaller label, top divider). */
+  nested?: boolean
 }
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
